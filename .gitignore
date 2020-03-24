@@ -1,0 +1,9 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# macOS droppings
+.DS_Store
+
+# Maven
+target/

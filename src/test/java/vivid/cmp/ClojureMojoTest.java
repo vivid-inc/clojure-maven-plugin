@@ -1,15 +1,17 @@
-package vivid;
+package vivid.cmp;
 
 
 import org.apache.maven.plugin.testing.MojoRule;
 import org.apache.maven.plugin.testing.WithoutMojo;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import java.io.File;
 
-public class MyMojoTest
+@Ignore
+public class ClojureMojoTest
 {
     @Rule
     public MojoRule rule = new MojoRule()
@@ -36,7 +38,7 @@ public class MyMojoTest
         assertNotNull( pom );
         assertTrue( pom.exists() );
 
-        MyMojo myMojo = ( MyMojo ) rule.lookupConfiguredMojo( pom, "touch" );
+        ClojureMojo myMojo = ( ClojureMojo ) rule.lookupConfiguredMojo( pom, "touch" );
         assertNotNull( myMojo );
         myMojo.execute();
 
