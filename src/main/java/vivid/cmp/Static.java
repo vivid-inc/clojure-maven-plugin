@@ -16,6 +16,11 @@ package vivid.cmp;
 
 import vivid.cherimoya.annotation.Constant;
 
+/**
+ *
+ * Identifiers using CamelCase convention prevalent in Java and Maven
+ * rather than dashed convention epitomized by Lisp.
+ */
 public class Static {
 
     private Static() {
@@ -23,16 +28,11 @@ public class Static {
     }
 
     private static final String DONT_MAKE_ME_THINK =
-            "Users prefer their existing Maven POM vivid:clojure-maven-plugin configuration to " +
-                    "remain compatible as-is with newer versions of this Maven plugin.";
+            "Maintaining forward-compatibility with newer versions of vivid:clojure-maven-plugin " +
+                    "is less cost and trouble for plugin users.";
 
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String POM_CMP_CLOJURE_MOJO_NAME = "clojure";
-
-
-    //
-    // Property keys
-    //
 
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String POM_CMP_ARGS_PROPERTY_KEY = "args";
@@ -43,5 +43,14 @@ public class Static {
 
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_KEY = "executable";
+
+    @Constant(rationale = "Fixed at the conventional Maven directory path for Clojure source code")
+    static final String[] POM_CMP_CLOJURE_SOURCE_PATHS_DEFAULT_VALUE = new String[] {"src/main/clojure"};
+
+    @Constant(rationale = "Fixed at the conventional Maven directory path for Clojure test code")
+    static final String[] POM_CMP_CLOJURE_TEST_PATHS_DEFAULT_VALUE = new String[] {"src/test/clojure"};
+
+    @Constant(rationale = DONT_MAKE_ME_THINK)
+    static final String POM_CMP_CLOJURE_SCOPE_PROPERTY_KEY = "mavenScope";
 
 }

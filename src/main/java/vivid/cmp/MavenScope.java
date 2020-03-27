@@ -12,6 +12,9 @@
  * the License.
  */
 
-File hakidasu = new File( basedir, "hakidasu.txt" );
+package vivid.cmp;
 
-assert hakidasu.isFile()
+enum MavenScope {
+    COMPILE,
+    TEST
+}

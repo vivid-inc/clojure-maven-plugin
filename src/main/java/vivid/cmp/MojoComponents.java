@@ -12,6 +12,17 @@
  * the License.
  */
 
-File hakidasu = new File( basedir, "hakidasu.txt" );
+package vivid.cmp;
 
-assert hakidasu.isFile()
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
+
+public interface MojoComponents {
+
+    DependencyResolver dependencyResolver();
+    I18nContext i18nContext();
+    Log log();
+    MavenSession mavenSession();
+
+}

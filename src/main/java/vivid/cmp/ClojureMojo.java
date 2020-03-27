@@ -14,169 +14,143 @@
 
 package vivid.cmp;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.exec.ShutdownHookProcessDestroyer;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.codehaus.plexus.i18n.I18N;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
- * Executes 'clojure' as a sub-process.
+ * Executes 'clojure' as a sub-process with a variety of options.
+ * If 'clojure' returns a non-zero exit value, it is wrapped in an
+ * Exception and fed back to Maven.
  *
  * @since 0.1.0
  */
 @Mojo(
-        name = Static.POM_CMP_CLOJURE_MOJO_NAME,
-        requiresDependencyResolution = ResolutionScope.TEST
+        name = Static.POM_CMP_CLOJURE_MOJO_NAME
 )
-public class ClojureMojo extends AbstractMojo {
+public class ClojureMojo extends AbstractMojo
+        implements MojoComponents {
 
     private I18nContext i18nContext;
 
 
-    //
-    // Maven execution environment configuration
-    //
+    @Component
+    private DependencyResolver dependencyResolver;
 
     @Component
     private I18N i18n;
 
-    @Parameter(required = true, property = "plugin.artifacts")
-    private java.util.List<Artifact> pluginArtifacts;
-
     @Parameter(required = true, readonly = true, property = "session")
-    private MavenSession session;
+    private MavenSession mavenSession;
 
-    @Parameter(required = true, readonly = true, property = "project.testClasspathElements")
-    private List<String> testClasspathElements;
+
+    @Override
+    public DependencyResolver dependencyResolver() {
+        return dependencyResolver;
+    }
+    @Override
+    public I18nContext i18nContext() {
+        return i18nContext;
+    }
+    @Override
+    public Log log() {
+        return getLog();
+    }
+    @Override
+    public MavenSession mavenSession() {
+        return mavenSession;
+    }
 
 
     //
     // User-provided configuration
     //
 
-    @Parameter(property = Static.POM_CMP_ARGS_PROPERTY_KEY)
-    private String args;
+    /**
+     * Arguments to 'clojure'. These are added to the arguments provided by this Maven plugin.
+     */
+    @Parameter(alias = Static.POM_CMP_ARGS_PROPERTY_KEY)
+    private String clojureArguments;
 
-    @Parameter(property = Static.POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_KEY, defaultValue = Static.POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_KEY)
+    /**
+     * The path to the 'clojure' executable. Without explicitly setting this parameter,
+     * the plugin expects 'clojure' to be available on the path. A specific path of anything
+     * at all can be specified here, including to something other than 'clojure'.
+     */
+    @Parameter(
+            alias = Static.POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_KEY,
+            defaultValue = Static.POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_DEFAULT_VALUE
+    )
     private String clojureExecutable;
 
+    /**
+     * Specifies how to configure the run-time classpath in the 'clojure' sub-process,
+     * according to Maven's notion of the current project's scoped elements.
+     * 'COMPILE' specifies compile- and runtime-scoped dependencies, source directories,
+     * and their output directories.
+     * 'TEST' will add test-scoped dependencies, test source directories, and test
+     * output directories.
+     */
+    @Parameter(alias = Static.POM_CMP_CLOJURE_SCOPE_PROPERTY_KEY, defaultValue = "COMPILE")
+    private MavenScope clojureClassPathScope;
+
+    /**
+     * Specifies paths containing Clojure source code to be added to the classpath for 'clojure'.
+     */
+    @Parameter
+    private String[] clojureSourcePaths = Static.POM_CMP_CLOJURE_SOURCE_PATHS_DEFAULT_VALUE;
+
+    /**
+     * Specifies paths containing Clojure test source code to be added to the classpath for 'clojure'.
+     */
+    @Parameter
+    private String[] clojureTestPaths = Static.POM_CMP_CLOJURE_TEST_PATHS_DEFAULT_VALUE;
+
+
     public void execute()
-        throws MojoExecutionException {
+            throws MojoExecutionException {
 
         i18nContext = new I18nContext(i18n);
 
-// Referencing
-// https://github.com/talios/clojure-maven-plugin
-// https://github.com/cognitect-labs/test-runner/blob/master/deps.edn
-// https://oli.me.uk/clojure-and-clojurescript-testing-with-the-clojure-cli/
-// https://github.com/ingesolvoll/lein-maven-plugin
-// https://github.com/redbadger/test-report-junit-xml
+        // Referencing
+        // https://github.com/cognitect-labs/test-runner/blob/master/deps.edn
+        // https://oli.me.uk/clojure-and-clojurescript-testing-with-the-clojure-cli/
+        // https://github.com/ingesolvoll/lein-maven-plugin
+        // https://github.com/redbadger/test-report-junit-xml
 
-// Set the classpath to that of Maven.
-// Run the clojure.test tests.
-// Write JUnit report files.
-// Report results on console and back to Maven ala surefire.
+        // Run the clojure.test tests.
+        // Write JUnit report files.
+        // Report results on console and back to Maven ala surefire.
 
-        executeSubProcess();
-    }
+        // Execute 'clojure'
+        SubProcess.executeSubProcess(
+                this,
 
-    private void executeSubProcess() throws MojoExecutionException {
-        // Employ Apache's commons-exec to handle the sub-process
-        final Executor exec = new DefaultExecutor();
+                // User-overridable path to the `clojure' CLI executable
+                clojureExecutable,
 
-        // stdin will not be connected to this process, implying no interactivity
-        exec.setStreamHandler(new PumpStreamHandler());
+                // User-provided arguments, if any
+                clojureArguments,
 
-        // The sub-process' working directory is set to the basedir of the Maven project
-        exec.setWorkingDirectory(projectBasedir());
+                // Calculated depending on the user-selectable Maven scope,
+                // 'compile' or 'test' for example
+                ClassPathology.getClassPathForScope(
+                        this,
+                        clojureClassPathScope,
+                        clojureSourcePaths,
+                        clojureTestPaths
+                ),
 
-        exec.setProcessDestroyer(new ShutdownHookProcessDestroyer());
-
-        final CommandLine commandLine = new CommandLine(clojureExecutable);
-        commandLine.addArguments(args);
-
-        // The Clojure sub-process utilizes Maven's classpath
-        commandLine.addArgument("-Scp");
-        commandLine.addArgument(
-                projectTestClassPathElements()
-                        .collect(Collectors.joining(":"))
+                // The sub-process inherits the same environment variables
+                // as the executing Maven process
+                System.getenv()
         );
-
-        // The sub-process inherits our environment variables
-        final Map<String, String> env = new HashMap<>(System.getenv());
-
-        exec(exec, commandLine, env,
-                getLog(), i18nContext);
-    }
-
-    private static void exec(
-            final Executor exec,
-            final CommandLine commandLine,
-            final Map<String, String> environment,
-            final Log log,
-            final I18nContext i18nContext
-    ) throws MojoExecutionException {
-        log.debug(
-                String.format(
-                        "Command line: %s",
-                        commandLine.toString()
-                )
-        );
-
-        int exitValue;
-        Exception failureException = null;
-        try {
-            exitValue = exec.execute(commandLine, environment);
-        } catch (final ExecuteException e) {
-            exitValue = e.getExitValue();
-            failureException = e;
-        } catch (final IOException e) {
-            exitValue = 1;
-            failureException = e;
-        }
-
-        if (exitValue != 0) {
-            throw new MojoExecutionException(
-                    i18nContext.getText(
-                            "vivid.clojure-maven-plugin.error.vcmpe-2-command-exit-value",
-                            commandLine.getExecutable(),
-                            exitValue
-                    ),
-                    failureException
-            );
-        }
-    }
-
-    private Stream<String> projectTestClassPathElements() {
-        return Stream.concat(
-                pluginArtifacts.stream().map(a -> a.getFile().getPath()),
-                testClasspathElements.stream()
-        );
-    }
-
-    private File projectBasedir() {
-        return session.getCurrentProject().getBasedir();
     }
 
 }
