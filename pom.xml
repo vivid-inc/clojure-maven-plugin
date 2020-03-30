@@ -60,6 +60,10 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/vivid-inc/vivid.cherimoya</url>
+        </repository>
     </repositories>
 
     <dependencies>
