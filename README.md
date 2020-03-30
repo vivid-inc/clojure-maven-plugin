@@ -1,8 +1,9 @@
 __THIS FIRST VERSION IS STILL A WORK IN PROGRESS__
 
 # Vivid Clojure Maven Plugin
+[![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat-square)](LICENSE.txt)
 
-`clojure-maven-plugin` is a single-minded Maven plugin that runs your Clojure commands and integrates your Clojure `clojure.test`-based tests into your Maven build.
+`clojure-maven-plugin` integrates Clojure tooling into your Maven builds.
 It is designed to cooperate with critters commonly found in Clojure- and Java-slinging development shops, likely the ones you are using now:
 
 - Apache Maven, which you have entrusted to be the primary driver of your build.
@@ -27,6 +28,39 @@ Bind that to a Maven phase.
 Setup Clojars as a Maven repo.
 Add a dependency to Clojure in your POM, or deps.edn.
 
+### `leiningen` goal
+
+Execute Leiningen directly within Maven's running process.
+Faster and less resource-intensive than running `lein` in a sub-process. 
+
+```xml
+<plugin>
+    <groupId>vivid</groupId>
+    <artifactId>clojure-maven-plugin</artifactId>
+    <version>0.1.0</version>
+    <executions>
+        <execution>
+            <id>leiningen-release-build</id>         <!-- Each execution requires a unique ID -->
+            <phase>compile</phase>                   <!-- Tie goal execution to the desired Maven phase -->
+            <goals>
+                <goal>leiningen</goal>               <!-- The vivid:clojure-maven-plugin Leiningen goal -->
+            </goals>
+            <configuration>
+
+                <!-- Immediately prior to running Leiningen, vivid:clojure-maven-plugin will
+                     automatically download the specified version of Leiningen and its
+                     dependencies your Maven's dependency resolution system. -->
+                <version>2.9.3</version>
+
+                <!-- Leiningen tasks, aliases. Any valid 'lein' CLI arguments can be used here. -->
+                <args>release</args>
+
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
 
 
 ## Development
@@ -43,18 +77,21 @@ bin/test.sh
 
 ## License and Attributions
 
-This project is dual-licensed under the Apache Public License and the Eclipse Public License, modulo portions derived from these donors:
+This project is licensed under the [Apache License Version 2.0](LICENSE.txt), modulo portions derived from these donors:
 
-- [Talios clojure-maven-plugin](https://github.com/talios/clojure-maven-plugin), EPL 1.0 license
-(TODO Link directly to the hash 8ce0d7dab93a418cfba0bcf68943c31291bcdc23)
+- [Inge Solvoll's `lein-maven-plugin`](https://github.com/ingesolvoll/lein-maven-plugin), MIT License.
+  [Attribution](src/main/resources/licenses/LICENSE-ingesolvoll-lein-maven-plugin.txt).
+- [Talios' `clojure-maven-plugin`](https://github.com/talios/clojure-maven-plugin), Eclipse Public License - v 1.0.
+  [Attribution](src/main/resources/licenses/LICENSE-talios-clojure-maven-plugin.html).
 
 
 
 ## TODO
 
-- Licensing: Apache and EPL dual license
-- CI, Sonar, dist
-- Implementation
+- Implementation.
+- More tests.
+- CI, Sonar, dist.
+- clojure-toolbox.com
 
 
 

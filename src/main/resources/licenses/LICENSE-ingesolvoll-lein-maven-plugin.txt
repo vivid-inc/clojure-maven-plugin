@@ -1,4 +1,4 @@
-Portions derived from Inge Solvoll's lein-maven-plugin software
+Portions of vivid:clojure-maven-plugin derived from Inge Solvoll's lein-maven-plugin
 
     https://github.com/ingesolvoll/lein-maven-plugin/tree/d86e5ded9c75018b26c99ff041f3dad7079d3d1a
 
