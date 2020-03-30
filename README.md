@@ -49,7 +49,7 @@ Faster and less resource-intensive than running `lein` in a sub-process.
 
                 <!-- Immediately prior to running Leiningen, vivid:clojure-maven-plugin will
                      automatically download the specified version of Leiningen and its
-                     dependencies your Maven's dependency resolution system. -->
+                     dependencies as necessary using Maven's dependency resolution system. -->
                 <version>2.9.3</version>
 
                 <!-- Leiningen tasks, aliases. Any valid 'lein' CLI arguments can be used here. -->
@@ -88,8 +88,7 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 
 ## TODO
 
-- Implementation.
-- More tests.
+- Implementation: `clojure` goal, `clojure.test` runner, JUnit-style reporting, more integration tests.
 - CI, Sonar, dist.
 - clojure-toolbox.com
 

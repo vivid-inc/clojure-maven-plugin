@@ -353,6 +353,7 @@
     <!-- TODO the -normalized.jar is actually to be the main .jar -->
 
     <profiles>
+
         <profile>
             <id>integration-tests</id>
             <activation>
@@ -392,6 +393,17 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>sonarcloud</id>
+            <properties>
+                <sonar.projectKey>vivid-inc_clojure-maven-plugin</sonar.projectKey>
+                <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+                <sonar.organization>vivid</sonar.organization>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+            </properties>
+        </profile>
+
     </profiles>
 
 </project>

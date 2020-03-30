@@ -1,0 +1,31 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          context: SonarCloud
+
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cmp-{{ checksum "pom.xml" }}
+            - cmp
+      - run: mvn dependency:go-offline -B
+      - run:
+          name: Quality quantification
+          command: |
+            bin/test.sh -B -Psonarcloud sonar:sonar
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: cmp-{{ checksum "pom.xml" }}
+#      - store_test_results:
+#          path: target/surefire-reports
