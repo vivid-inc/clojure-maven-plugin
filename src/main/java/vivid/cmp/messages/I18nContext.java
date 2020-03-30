@@ -12,9 +12,30 @@
  * the License.
  */
 
-package vivid.cmp;
+package vivid.cmp.messages;
 
-enum MavenScope {
-    COMPILE,
-    TEST
+import org.codehaus.plexus.i18n.I18N;
+
+import java.util.Locale;
+
+public class I18nContext {
+
+    private static final String I18N_RESOURCE_BUNDLE = "vivid-clojure-maven-plugin-i18n";
+
+    private final I18N i18n;
+
+    public I18nContext(
+            final I18N i18n
+    ) {
+        this.i18n = i18n;
+    }
+
+    public String getText(
+            final String i18nKey,
+            final Object... args
+    ) {
+        final Locale locale = Locale.getDefault();
+        return i18n.format(I18N_RESOURCE_BUNDLE, locale, i18nKey, args);
+    }
+
 }

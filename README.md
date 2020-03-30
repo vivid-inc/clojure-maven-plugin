@@ -1,3 +1,5 @@
+__THIS FIRST VERSION IS STILL A WORK IN PROGRESS__
+
 # Vivid Clojure Maven Plugin
 
 `clojure-maven-plugin` is a single-minded Maven plugin that runs your Clojure commands and integrates your Clojure `clojure.test`-based tests into your Maven build.

@@ -12,17 +12,16 @@
  * the License.
  */
 
-package vivid.cmp;
+package vivid.cmp.mojo;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
+import io.vavr.collection.List;
+import io.vavr.control.Option;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
-import org.codehaus.plexus.i18n.I18N;
+import vivid.cmp.classpath.ClassPathology;
+import vivid.cmp.classpath.ClasspathScopes;
+import vivid.cmp.components.SubProcess;
 
 /**
  * Executes 'clojure' as a sub-process with a variety of options.
@@ -32,40 +31,9 @@ import org.codehaus.plexus.i18n.I18N;
  * @since 0.1.0
  */
 @Mojo(
-        name = Static.POM_CMP_CLOJURE_MOJO_NAME
+        name = AbstractCMPMojo.POM_CMP_CLOJURE_MOJO_GOAL_NAME
 )
-public class ClojureMojo extends AbstractMojo
-        implements MojoComponents {
-
-    private I18nContext i18nContext;
-
-
-    @Component
-    private DependencyResolver dependencyResolver;
-
-    @Component
-    private I18N i18n;
-
-    @Parameter(required = true, readonly = true, property = "session")
-    private MavenSession mavenSession;
-
-
-    @Override
-    public DependencyResolver dependencyResolver() {
-        return dependencyResolver;
-    }
-    @Override
-    public I18nContext i18nContext() {
-        return i18nContext;
-    }
-    @Override
-    public Log log() {
-        return getLog();
-    }
-    @Override
-    public MavenSession mavenSession() {
-        return mavenSession;
-    }
+public class ClojureMojo extends AbstractCMPMojo {
 
 
     //
@@ -75,19 +43,16 @@ public class ClojureMojo extends AbstractMojo
     /**
      * Arguments to 'clojure'. These are added to the arguments provided by this Maven plugin.
      */
-    @Parameter(alias = Static.POM_CMP_ARGS_PROPERTY_KEY)
-    private String clojureArguments;
+    @Parameter
+    private String args = ClojureMojoState.DEFAULT_STATE.args.getOrElse((String) null);
 
     /**
      * The path to the 'clojure' executable. Without explicitly setting this parameter,
      * the plugin expects 'clojure' to be available on the path. A specific path of anything
      * at all can be specified here, including to something other than 'clojure'.
      */
-    @Parameter(
-            alias = Static.POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_KEY,
-            defaultValue = Static.POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_DEFAULT_VALUE
-    )
-    private String clojureExecutable;
+    @Parameter
+    private String executable = ClojureMojoState.DEFAULT_STATE.executable;
 
     /**
      * Specifies how to configure the run-time classpath in the 'clojure' sub-process,
@@ -97,27 +62,38 @@ public class ClojureMojo extends AbstractMojo
      * 'TEST' will add test-scoped dependencies, test source directories, and test
      * output directories.
      */
-    @Parameter(alias = Static.POM_CMP_CLOJURE_SCOPE_PROPERTY_KEY, defaultValue = "COMPILE")
-    private MavenScope clojureClassPathScope;
+    @Parameter
+    private ClasspathScopes classpathScope = ClojureMojoState.DEFAULT_STATE.classpathScope;
 
     /**
-     * Specifies paths containing Clojure source code to be added to the classpath for 'clojure'.
+     * Specifies paths containing Clojure source code to be added to the
+     * classpath for 'clojure'.
      */
     @Parameter
-    private String[] clojureSourcePaths = Static.POM_CMP_CLOJURE_SOURCE_PATHS_DEFAULT_VALUE;
+    private String[] sourcePaths = ClojureMojoState.DEFAULT_STATE.sourcePaths.toJavaArray(String[]::new);
 
     /**
-     * Specifies paths containing Clojure test source code to be added to the classpath for 'clojure'.
+     * Specifies paths containing Clojure test source code to be added to
+     * the classpath for 'clojure'.
      */
     @Parameter
-    private String[] clojureTestPaths = Static.POM_CMP_CLOJURE_TEST_PATHS_DEFAULT_VALUE;
+    private String[] testPaths = ClojureMojoState.DEFAULT_STATE.testPaths.toJavaArray(String[]::new);
 
 
+    @Override
     public void execute()
             throws MojoExecutionException {
+        super.initialize();
 
-        i18nContext = new I18nContext(i18n);
+        final ClojureMojoState state = new ClojureMojoState(
+                Option.of(args),
+                executable,
+                classpathScope,
+                List.of(sourcePaths),
+                List.of(testPaths)
+        );
 
+        // TODO 'clojure.test & junit'
         // Referencing
         // https://github.com/cognitect-labs/test-runner/blob/master/deps.edn
         // https://oli.me.uk/clojure-and-clojurescript-testing-with-the-clojure-cli/
@@ -133,18 +109,16 @@ public class ClojureMojo extends AbstractMojo
                 this,
 
                 // User-overridable path to the `clojure' CLI executable
-                clojureExecutable,
+                executable,
 
                 // User-provided arguments, if any
-                clojureArguments,
+                args,
 
                 // Calculated depending on the user-selectable Maven scope,
                 // 'compile' or 'test' for example
                 ClassPathology.getClassPathForScope(
                         this,
-                        clojureClassPathScope,
-                        clojureSourcePaths,
-                        clojureTestPaths
+                        state
                 ),
 
                 // The sub-process inherits the same environment variables

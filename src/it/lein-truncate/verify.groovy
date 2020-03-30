@@ -12,17 +12,6 @@
  * the License.
  */
 
-package vivid.cmp;
+File proofFile= new File( basedir, "proof" );
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
-
-public interface MojoComponents {
-
-    DependencyResolver dependencyResolver();
-    I18nContext i18nContext();
-    Log log();
-    MavenSession mavenSession();
-
-}
+assert proofFile.isFile()

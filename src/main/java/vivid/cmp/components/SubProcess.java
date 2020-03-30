@@ -12,7 +12,7 @@
  * the License.
  */
 
-package vivid.cmp;
+package vivid.cmp.components;
 
 import io.vavr.collection.Stream;
 import org.apache.commons.exec.CommandLine;
@@ -22,6 +22,7 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.maven.plugin.MojoExecutionException;
+import vivid.cmp.mojo.AbstractCMPMojo;
 
 import java.io.IOException;
 import java.util.Map;
@@ -32,8 +33,8 @@ public class SubProcess {
         // Hide the public constructor
     }
 
-    static void executeSubProcess(
-            final MojoComponents mojo,
+    public static void executeSubProcess(
+            final AbstractCMPMojo mojo,
             final String clojureExecutable,
             final String args,
             final Stream<String> classPath,
@@ -71,12 +72,12 @@ public class SubProcess {
     }
 
     private static void exec(
-            final MojoComponents mojo,
+            final AbstractCMPMojo mojo,
             final Executor exec,
             final CommandLine commandLine,
             final Map<String, String> environment
     ) throws MojoExecutionException {
-        mojo.log().debug(
+        mojo.getLog().debug(
                 String.format(
                         "Command line: %s",
                         String.join(" ", commandLine.toStrings())
@@ -106,4 +107,5 @@ public class SubProcess {
             );
         }
     }
+
 }
