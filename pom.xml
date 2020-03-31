@@ -61,15 +61,15 @@
             </releases>
         </repository>
         <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/vivid-inc/vivid.cherimoya</url>
+            <id>bintray-vivid</id>
+            <url>https://dl.bintray.com/vivid/vivid</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/vivid-inc/vivid.cherimoya</url>
+            <id>bintray-vivid</id>
+            <url>https://dl.bintray.com/vivid/vivid</url>
         </pluginRepository>
     </pluginRepositories>
 
