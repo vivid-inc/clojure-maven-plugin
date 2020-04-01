@@ -35,6 +35,7 @@ public class ClassPathology {
         // Hide the public constructor
     }
 
+    @SuppressWarnings("java:S2095")
     public static void addToClassLoader(
             final AbstractCMPMojo mojo,
             final org.eclipse.aether.resolution.ArtifactResult artifact,

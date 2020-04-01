@@ -211,21 +211,6 @@
         <plugins>
 
             <plugin>
-                <groupId>com.github.manouti</groupId>
-                <artifactId>jar-timestamp-normalize-maven-plugin</artifactId>
-                <version>0.1.0</version>
-                <executions>
-                    <execution>
-                        <id>jar-normalize</id>
-                        <goals>
-                            <goal>normalize</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.0.0</version>
