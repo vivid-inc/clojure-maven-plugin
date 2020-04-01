@@ -27,15 +27,38 @@
     <version>0.1.0</version>
     <packaging>maven-plugin</packaging>
 
+    <organization>
+        <name>Vivid Inc.</name>
+        <url>https://vivid-inc.net</url>
+    </organization>
+
     <name>Vivid Clojure Maven Plugin</name>
     <description>Conveniently integrate Clojure tooling into Maven</description>
     <inceptionYear>2020</inceptionYear>
     <url>https://github.com/vivid-inc/clojure-maven-plugin</url>
 
+    <ciManagement>
+        <system>CircleCI</system>
+        <url>https://circleci.com/gh/vivid-inc/clojure-maven-plugin</url>
+    </ciManagement>
+    <distributionManagement>
+        <repository>
+            <id>clojars.org</id>
+            <url>https://repo.clojars.org/</url>
+        </repository>
+    </distributionManagement>
     <issueManagement>
         <system>GitHub issues</system>
         <url>https://github.com/vivid-inc/clojure-maven-plugin/issues</url>
     </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>Copyright (c) 2020 Vivid Inc.</comments>
+        </license>
+    </licenses>
     <scm>
         <url>https://github.com/vivid-inc/clojure-maven-plugin</url>
     </scm>
@@ -53,23 +76,52 @@
     </properties>
 
     <repositories>
+        <!-- Order maven-central first where the hit rate is near perfect, and not
+             Clojars which by definition has what maven-central doesn't. -->
         <repository>
-            <id>clojars</id>
-            <url>https://clojars.org/repo/</url>
+            <id>maven-central</id>
+            <url>https://repo1.maven.org/maven2</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
-            <id>bintray-vivid</id>
-            <url>https://dl.bintray.com/vivid/vivid</url>
+            <id>clojars.org</id>
+            <url>https://repo.clojars.org/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
     <pluginRepositories>
+        <!-- Order maven-central first where the hit rate is near perfect, and not
+             Clojars which by definition has what maven-central doesn't. -->
         <pluginRepository>
-            <id>bintray-vivid</id>
-            <url>https://dl.bintray.com/vivid/vivid</url>
+            <id>maven-central</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>clojars.org</id>
+            <url>https://repo.clojars.org/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </pluginRepository>
     </pluginRepositories>
 
@@ -361,8 +413,6 @@
 
     </build>
 
-    <!-- TODO the -normalized.jar is actually to be the main .jar -->
-
     <profiles>
 
         <profile>
@@ -397,6 +447,40 @@
                                     <goal>install</goal>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>jar</goal>
                                 </goals>
                             </execution>
                         </executions>

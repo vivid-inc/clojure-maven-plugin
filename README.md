@@ -1,37 +1,37 @@
-__THIS FIRST VERSION IS STILL A WORK IN PROGRESS__
-
-# Vivid Clojure Maven Plugin
+  # Vivid Clojure Maven Plugin
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat-square)](LICENSE.txt)
+[![Current version](https://img.shields.io/clojars/v/vivid/clojure-maven-plugin.svg?color=blue&style=flat-square)](https://clojars.org/vivid/clojure-maven-plugin)
+[![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.1.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=vivid-inc_clojure-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=vivid-inc_clojure-maven-plugin)
+
 
 `clojure-maven-plugin` integrates Clojure tooling into your Maven builds.
-It is designed to cooperate with critters commonly found in Clojure- and Java-slinging development shops, likely the ones you are using now:
+Intentionally Spartan, it is specifically designed to wrangle those critters commonly found in Clojure- and Java-slinging development shops, likely the ones you are using now:
 
-- Apache Maven, which you have entrusted to be the primary driver of your build.
-- The `clojure` CLI command and its `deps.edn` system.
-- Optional `clojure.test` execution and build breaking.
-- Optional JUnit-style test reporting output, compatible with virtually all Java-savvy Continuous Integration systems.
-
-Intentionally Spartan: If you note a feature that doesn't directly contribute to running your Clojure commands and Clojure-based tests from Maven, let us know so that we may excise it.
+- Apache Maven, the primary driver of your build.
+- Leiningen `project.clj` workflows in-process in Maven.
 
 
 
 ## Usage
 
-Include Clojure code into a Maven project that is not of type `clojure`.
-So, you have some Clojure code or test code that needs access to the classpath assembled by Maven; this plugin does just that.
-Structure your Clojure code or `clojure.test` code around [`deps.edn`](https://clojure.org/reference/deps_and_cli).
-Add the Maven plugin to your POM.
-Set the goal in the POM.
-`clojure` needs to be on the path, or alternatively specify a path using `clojureExecutable`.
-Optionally provide args.
-Bind that to a Maven phase.
-Setup Clojars as a Maven repo.
-Add a dependency to Clojure in your POM, or deps.edn.
+First, ensure your Maven build targets Clojars for dependency and plugin resolution by adding this snippet:
+
+```xml
+<repository>
+    <id>clojars.org</id>
+    <url>https://repo.clojars.org/</url>
+</repository>
+```
+
+to each of the `<repositories>` and `<pluginRepositories>` sections in your `pom.xml`.
+
+
 
 ### `leiningen` goal
 
 Execute Leiningen directly within Maven's running process.
-Faster and less resource-intensive than running `lein` in a sub-process. 
+Faster and less resource-intensive than running `lein` in a sub-process.
 
 ```xml
 <plugin>
@@ -88,9 +88,7 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 
 ## TODO
 
-- Implementation: `clojure` goal, `clojure.test` runner, JUnit-style reporting, more integration tests.
-- CI, Sonar, dist.
-- clojure-toolbox.com
+- Implementation: `clojure` goal, `clojure.test` runner, JUnit-style reporting. `write-deps-edn` goal. More integration tests.
 
 
 

@@ -80,6 +80,7 @@ public class ClojureMojo extends AbstractCMPMojo {
     private String[] testPaths = ClojureMojoState.DEFAULT_STATE.testPaths.toJavaArray(String[]::new);
 
 
+    @SuppressWarnings("java:S5304")
     @Override
     public void execute()
             throws MojoExecutionException {
