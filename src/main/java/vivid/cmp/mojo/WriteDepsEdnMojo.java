@@ -56,7 +56,7 @@ public class WriteDepsEdnMojo extends AbstractCMPMojo {
     // Maven components
     //
 
-    @Component
+    @Parameter(defaultValue = "${plugin}", readonly = true, required = true)
     private PluginDescriptor pluginDescriptor;
 
 

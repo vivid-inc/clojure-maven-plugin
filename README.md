@@ -86,10 +86,4 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 
 
 
-## TODO
-
-- Implementation: `clojure` goal, `clojure.test` runner, JUnit-style reporting. `write-deps-edn` goal. More integration tests.
-
-
-
 © Copyright Vivid Inc.

@@ -17,3 +17,7 @@ Optionally provide args.
 Bind that to a Maven phase.
 Setup Clojars as a Maven repo and pluginRepo.
 Add a dependency to Clojure in your POM, or deps.edn.
+
+### Implementation
+
+`clojure` goal, `clojure.test` runner, JUnit-style reporting. `write-deps-edn` goal. More integration tests.

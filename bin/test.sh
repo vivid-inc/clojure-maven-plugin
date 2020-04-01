@@ -8,7 +8,7 @@ echo Running all tests
 export TZ=UTC
 
 # Aim for a clean build
-find . -name target -type d -exec rm -r {} +
+find . -depth -name target -type d -exec rm -r {} +
 
 # Run all tests, create the deliverables
 mvn clean install $@
