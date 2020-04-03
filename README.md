@@ -1,7 +1,7 @@
   # Vivid Clojure Maven Plugin
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat-square)](LICENSE.txt)
 [![Current version](https://img.shields.io/clojars/v/vivid/clojure-maven-plugin.svg?color=blue&style=flat-square)](https://clojars.org/vivid/clojure-maven-plugin)
-[![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.1.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
+[![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.2.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=vivid-inc_clojure-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=vivid-inc_clojure-maven-plugin)
 
 
@@ -37,7 +37,7 @@ Faster and less resource-intensive than running `lein` in a sub-process.
 <plugin>
     <groupId>vivid</groupId>
     <artifactId>clojure-maven-plugin</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <executions>
         <execution>
             <id>leiningen-release-build</id>         <!-- Each execution requires a unique ID -->
