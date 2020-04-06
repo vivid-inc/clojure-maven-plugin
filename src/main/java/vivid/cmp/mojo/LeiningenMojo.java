@@ -23,8 +23,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import vivid.cherimoya.annotation.Constant;
-import vivid.cmp.classpath.ClassPathology;
-import vivid.cmp.components.Resolution;
+import vivid.cmp.fns.ClassPathology;
+import vivid.cmp.fns.MavenDependencyFns;
 
 import java.io.IOException;
 
@@ -56,31 +56,37 @@ import java.io.IOException;
  * @since 0.1.0
  */
 @Mojo(
-        name = AbstractCMPMojo.POM_CMP_LEININGEN_GOAL_NAME
+        name = AbstractCMPMojo.LEININGEN_GOAL_NAME
 )
 public class LeiningenMojo extends AbstractCMPMojo {
 
-    private static final String LEININGEN_MAVEN_G_A = "leiningen";
+    private static final String LEININGEN_LIB_DEPENDENCY_MAVEN_G_A = "leiningen";
 
     private static final String VIVID_CLOJURE_MAVEN_PLUGIN_NS = "vivid.cmp.leiningen";
     private static final String LEIN_MAIN_FN = "lein-main";
 
-    @Constant
-    private static final String POM_CMP_LEININGEN_GOAL_PROPERTY_KEY_PREFIX = "leiningen.";
 
     @Constant
-    private static final String POM_CMP_LEININGEN_GOAL_ARGS_PROPERTY_KEY =
-            POM_CMP_LEININGEN_GOAL_PROPERTY_KEY_PREFIX + "args";
+    private static final String CLOJURE_GOAL_PROPERTY_KEY_PREFIX =
+            AbstractCMPMojo.LEININGEN_GOAL_NAME + ".";
 
     @Constant
-    private static final String POM_CMP_LEININGEN_GOAL_VERSION_PROPERTY_KEY =
-            POM_CMP_LEININGEN_GOAL_PROPERTY_KEY_PREFIX + "version";
+    private static final String LEININGEN_GOAL_ARGS_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + "args";
+
+    @Constant
+    private static final String LEININGEN_GOAL_VERSION_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + "version";
 
 
-    @Parameter(required = true, property = POM_CMP_LEININGEN_GOAL_ARGS_PROPERTY_KEY)
+    //
+    // User-provided configuration
+    //
+
+    @Parameter(required = true, property = LEININGEN_GOAL_ARGS_PROPERTY_KEY)
     private String args;
 
-    @Parameter(required = true, property = POM_CMP_LEININGEN_GOAL_VERSION_PROPERTY_KEY)
+    @Parameter(required = true, property = LEININGEN_GOAL_VERSION_PROPERTY_KEY)
     private String version;
 
 
@@ -89,17 +95,17 @@ public class LeiningenMojo extends AbstractCMPMojo {
             throws MojoExecutionException, MojoFailureException {
         super.initialize();
 
-        final Dependency dependency = Resolution.newDependency(
-                LEININGEN_MAVEN_G_A,
-                LEININGEN_MAVEN_G_A,
+        final Dependency dependency = MavenDependencyFns.newDependency(
+                LEININGEN_LIB_DEPENDENCY_MAVEN_G_A,
+                LEININGEN_LIB_DEPENDENCY_MAVEN_G_A,
                 version
         );
 
         try {
             ClassPathology.addToClassLoader(
                     this,
-                    Resolution.resolveArtifact(this, dependency),
-                    Resolution.resolveDependencies(this, dependency)
+                    MavenDependencyFns.resolveArtifact(this, dependency),
+                    MavenDependencyFns.resolveDependencies(this, dependency)
             );
             lein(args);
         } catch (final MojoFailureException e) {

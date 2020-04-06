@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>vivid.clojure-maven-plugin.it</groupId>
-  <artifactId>write-deps-edn-simple</artifactId>
+  <artifactId>multiple-use-project</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <description>A simple IT verifying the basic use case.</description>
+  <description>An IT loosely verifying the deps.edn use case demonstrated in the README.md</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,30 +36,22 @@
         <version>@project.version@</version>
           <executions>
               <execution>
-                  <id>hello-world</id>
+                  <id>hello-wumpus</id>
                   <phase>compile</phase>
                   <goals>
                       <goal>clojure</goal>
                   </goals>
                   <configuration>
-                      <args>-m hello-world</args>
+                      <args>-m hello-wumpus.core</args>
+                      <sourcePaths>
+                          <sourcePath>src/main/clojure</sourcePath>
+                      </sourcePaths>
                   </configuration>
               </execution>
               <execution>
-                  <id>superfluous</id>
-                  <phase>compile</phase>
-                  <goals>
-                      <goal>help</goal>
-                  </goals>
-                  <configuration>
-                      <args>-A:help and stuff</args>
-                  </configuration>
-              </execution>
-              <execution>
-                  <id>simple-hello-world</id>
                   <phase>validate</phase>
                   <goals>
-                      <goal>write-deps-edn</goal>
+                      <goal>deps.edn</goal>
                   </goals>
               </execution>
           </executions>

@@ -19,21 +19,54 @@ import io.vavr.control.Option;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import vivid.cmp.classpath.ClassPathology;
-import vivid.cmp.classpath.ClasspathScopes;
-import vivid.cmp.components.SubProcess;
+import vivid.cherimoya.annotation.Constant;
+import vivid.cmp.datatypes.ClasspathScope;
+import vivid.cmp.datatypes.ClojureMojoState;
+import vivid.cmp.fns.ClassPathology;
+import vivid.cmp.fns.SubProcessFns;
+
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_ARGS_PARAMETER_KEY;
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_CLASSPATHSCOPE_PARAMETER_KEY;
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_EXECUTABLE_PARAMETER_KEY;
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_SOURCEPATHS_PARAMETER_KEY;
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_TESTPATHS_PARAMETER_KEY;
 
 /**
  * Executes 'clojure' as a sub-process with a variety of options.
  * If 'clojure' returns a non-zero exit value, it is wrapped in an
  * Exception and fed back to Maven.
  *
- * @since 0.1.0
+ * @since 0.2.0
  */
 @Mojo(
-        name = AbstractCMPMojo.POM_CMP_CLOJURE_MOJO_GOAL_NAME
+        name = AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME
 )
 public class ClojureMojo extends AbstractCMPMojo {
+
+
+    @Constant
+    private static final String CLOJURE_GOAL_PROPERTY_KEY_PREFIX =
+            AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME + ".";
+
+    @Constant
+    private static final String CLOJURE_ARGS_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_ARGS_PARAMETER_KEY;
+
+    @Constant
+    private static final String CLOJURE_CLASSPATHSCOPE_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_CLASSPATHSCOPE_PARAMETER_KEY;
+
+    @Constant
+    private static final String CLOJURE_EXECUTABLE_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_EXECUTABLE_PARAMETER_KEY;
+
+    @Constant
+    private static final String CLOJURE_SOURCEPATHS_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_SOURCEPATHS_PARAMETER_KEY;
+
+    @Constant
+    private static final String CLOJURE_TESTPATHS_PROPERTY_KEY =
+            CLOJURE_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_TESTPATHS_PARAMETER_KEY;
 
 
     //
@@ -43,16 +76,8 @@ public class ClojureMojo extends AbstractCMPMojo {
     /**
      * Arguments to 'clojure'. These are added to the arguments provided by this Maven plugin.
      */
-    @Parameter
+    @Parameter(property = CLOJURE_ARGS_PROPERTY_KEY)
     private String args = ClojureMojoState.DEFAULT_STATE.args.getOrElse((String) null);
-
-    /**
-     * The path to the 'clojure' executable. Without explicitly setting this parameter,
-     * the plugin expects 'clojure' to be available on the path. A specific path of anything
-     * at all can be specified here, including to something other than 'clojure'.
-     */
-    @Parameter
-    private String executable = ClojureMojoState.DEFAULT_STATE.executable;
 
     /**
      * Specifies how to configure the run-time classpath in the 'clojure' sub-process,
@@ -62,21 +87,29 @@ public class ClojureMojo extends AbstractCMPMojo {
      * 'TEST' will add test-scoped dependencies, test source directories, and test
      * output directories.
      */
-    @Parameter
-    private ClasspathScopes classpathScope = ClojureMojoState.DEFAULT_STATE.classpathScope;
+    @Parameter(property = CLOJURE_CLASSPATHSCOPE_PROPERTY_KEY)
+    private ClasspathScope classpathScope = ClojureMojoState.DEFAULT_STATE.classpathScope;
+
+    /**
+     * The path to the 'clojure' executable. Without explicitly setting this parameter,
+     * the plugin expects 'clojure' to be available on the path. A specific path to anything
+     * at all can be specified here, including to something other than 'clojure'.
+     */
+    @Parameter(property = CLOJURE_EXECUTABLE_PROPERTY_KEY)
+    private String executable = ClojureMojoState.DEFAULT_STATE.executable;
 
     /**
      * Specifies paths containing Clojure source code to be added to the
      * classpath for 'clojure'.
      */
-    @Parameter
+    @Parameter(property = CLOJURE_SOURCEPATHS_PROPERTY_KEY)
     private String[] sourcePaths = ClojureMojoState.DEFAULT_STATE.sourcePaths.toJavaArray(String[]::new);
 
     /**
      * Specifies paths containing Clojure test source code to be added to
      * the classpath for 'clojure'.
      */
-    @Parameter
+    @Parameter(property = CLOJURE_TESTPATHS_PROPERTY_KEY)
     private String[] testPaths = ClojureMojoState.DEFAULT_STATE.testPaths.toJavaArray(String[]::new);
 
 
@@ -94,19 +127,8 @@ public class ClojureMojo extends AbstractCMPMojo {
                 List.of(testPaths)
         );
 
-        // TODO 'clojure.test & junit'
-        // Referencing
-        // https://github.com/cognitect-labs/test-runner/blob/master/deps.edn
-        // https://oli.me.uk/clojure-and-clojurescript-testing-with-the-clojure-cli/
-        // https://github.com/ingesolvoll/lein-maven-plugin
-        // https://github.com/redbadger/test-report-junit-xml
-
-        // Run the clojure.test tests.
-        // Write JUnit report files.
-        // Report results on console and back to Maven ala surefire.
-
         // Execute 'clojure'
-        SubProcess.executeSubProcess(
+        SubProcessFns.executeSubProcess(
                 this,
 
                 // User-overridable path to the `clojure' CLI executable
@@ -119,8 +141,8 @@ public class ClojureMojo extends AbstractCMPMojo {
                 // 'compile' or 'test' for example
                 ClassPathology.getClassPathForScope(
                         this,
-                        state
-                ),
+                        state,
+                        true),
 
                 // The sub-process inherits the same environment variables
                 // as the executing Maven process

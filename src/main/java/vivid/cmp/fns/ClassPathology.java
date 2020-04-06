@@ -12,22 +12,22 @@
  * the License.
  */
 
-package vivid.cmp.classpath;
+package vivid.cmp.fns;
 
-import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import vivid.cmp.components.Resolution;
+import vivid.cmp.datatypes.ClasspathScope;
+import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.mojo.AbstractCMPMojo;
-import vivid.cmp.mojo.ClojureMojoState;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.function.Function;
 
 public class ClassPathology {
 
@@ -69,28 +69,41 @@ public class ClassPathology {
 
     public static Stream<String> getClassPathForScope(
             final AbstractCMPMojo mojo,
-            final ClojureMojoState state
-    ) throws MojoExecutionException {
-        // Dynamically resolve the classpath for the sub-process
-        final Set<Artifact> dependencies = Resolution.getResolvedDependencies(
-                mojo,
-                state
-        );
-
+            final ClojureMojoState state,
+            boolean includeTransitiveDependencies
+    ) {
         return Stream
                 .ofAll(state.sourcePaths)
                 .append(
                         mojo.mavenSession().getCurrentProject().getBuild().getOutputDirectory()
                 )
                 .appendAll(
-                        state.classpathScope == ClasspathScopes.TEST ?
+                        state.classpathScope == ClasspathScope.TEST ?
                                 Stream.ofAll(state.testPaths)
                                         .append(mojo.mavenSession().getCurrentProject().getBuild().getOutputDirectory())
                                 : Stream.empty()
                 )
                 .appendAll(
-                        dependencies.map(d -> d.getFile().getPath())
+                        includeTransitiveDependencies ?
+                                // Dynamically resolve the classpath for the sub-process
+                                MavenDependencyFns.getResolvedDependencies(
+                                        mojo,
+                                        state
+                                ).map(d -> d.getFile().getPath()) :
+                                Stream.empty()
+                )
+                .map(
+                        relativePath(mojo.mavenSession().getCurrentProject().getBasedir().toPath())
                 );
+    }
+
+    private static Function<String, String> relativePath(
+            final Path base
+    ) {
+        return fileStr -> base
+                .toAbsolutePath()
+                .relativize( new File(fileStr).toPath().toAbsolutePath() )
+                .toString();
     }
 
 }

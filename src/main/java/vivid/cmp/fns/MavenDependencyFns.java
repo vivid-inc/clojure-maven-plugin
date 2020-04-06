@@ -12,7 +12,7 @@
  * the License.
  */
 
-package vivid.cmp.components;
+package vivid.cmp.fns;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -21,7 +21,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -30,35 +29,35 @@ import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverE
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import vivid.cmp.classpath.ClasspathScopes;
+import vivid.cmp.datatypes.ClasspathScope;
+import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.mojo.AbstractCMPMojo;
-import vivid.cmp.mojo.ClojureMojoState;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import static org.apache.maven.shared.artifact.filter.resolve.ScopeFilter.including;
 
-public class Resolution {
+public class MavenDependencyFns {
 
-    private Resolution() {
+    private MavenDependencyFns() {
         // Hide the public constructor
     }
 
     public static Set<Artifact> getResolvedDependencies(
             final AbstractCMPMojo mojo,
             final ClojureMojoState state
-    )
-            throws MojoExecutionException
-    {
+    ) {
         try {
-            final Iterable<ArtifactResult> dependencies = mojo.dependencyResolver().resolveDependencies(
-                    mojo.mavenSession().getProjectBuildingRequest(),
-                    mojo.mavenSession().getCurrentProject().getDependencies(),
-                    mojo.mavenSession().getCurrentProject().getDependencies(),
-                    including( state.classpathScope.effectiveScopesAsJavaArray() )
-            );
+            final Iterable<ArtifactResult> dependencies =
+                    mojo.dependencyResolver().resolveDependencies(
+                            mojo.mavenSession().getProjectBuildingRequest(),
+                            mojo.mavenSession().getCurrentProject().getDependencies(),
+                            mojo.mavenSession().getCurrentProject().getDependencies(),
+                            including( state.classpathScope.effectiveScopesAsJavaArray() )
+                    );
 
             return Stream
                     .ofAll(dependencies)
@@ -66,7 +65,10 @@ public class Resolution {
                     .collect(HashSet.collector());
         }
         catch (final DependencyResolverException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            // TODO Convert to Either<Message, ...>
+            System.out.println(e.getLocalizedMessage());
+            System.exit(1);
+            return null;
         }
     }
 
@@ -114,15 +116,16 @@ public class Resolution {
             final Dependency dependency
     ) throws DependencyResolverException, MojoFailureException {
         mojo.getLog().debug("Resolving dependencies for: " + dependency);
-        final Iterable<ArtifactResult> dependencyArtifacts = mojo.dependencyResolver.resolveDependencies(
-                newProjectBuildingRequest(
-                        mojo.mavenSession.getProjectBuildingRequest(),
-                        mojo.remoteRepositories
-                ),
-                Collections.singletonList(dependency),
-                Collections.singletonList(dependency),
-                including( ClasspathScopes.COMPILE.effectiveScopesAsJavaArray() )
-        );
+        final Iterable<ArtifactResult> dependencyArtifacts =
+                mojo.dependencyResolver.resolveDependencies(
+                        newProjectBuildingRequest(
+                                mojo.mavenSession.getProjectBuildingRequest(),
+                                mojo.remoteRepositories
+                        ),
+                        Collections.singletonList(dependency),
+                        Collections.singletonList(dependency),
+                        including( ClasspathScope.COMPILE.effectiveScopesAsJavaArray() )
+                );
 
         if (dependencyArtifacts == null || !dependencyArtifacts.iterator().hasNext()) {
             throw new MojoFailureException(
@@ -153,6 +156,12 @@ public class Resolution {
                         dependency.getVersion()
                 )
         );
+    }
+
+    public static Predicate<Dependency> inScopeP(
+            final ClasspathScope classpathScope
+    ) {
+        return dependency -> classpathScope.effectiveScopes.contains(dependency.getScope());
     }
 
 }

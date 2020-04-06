@@ -28,6 +28,109 @@ to each of the `<repositories>` and `<pluginRepositories>` sections in your `pom
 
 
 
+### `clojure` goal
+
+Execute's Clojure in a sub-process using the Maven project's classpath.
+
+```xml
+<plugin>
+    <groupId>vivid</groupId>
+    <artifactId>clojure-maven-plugin</artifactId>
+    <version>0.2.0</version>
+    <executions>
+        <execution>
+            <id>leiningen-release-build</id>         <!-- Each execution requires a unique ID -->
+            <phase>compile</phase>                   <!-- Tie goal execution to the desired Maven phase -->
+            <goals>
+                <goal>clojure</goal>                 <!-- The vivid:clojure-maven-plugin Clojure goal -->
+            </goals>
+            <configuration>
+
+                <!-- Optional -->
+                <executable>clojure</executable>
+
+                <!-- Optional arguments to Clojure. If CLI app, use <![CDATA[ \-\- ]]> to pass args to the app. -->
+                <args>release</args>
+
+                <!-- Defaults to COMPILE -->
+                <classpathScope>TEST</classpathScope>
+
+                <!-- Defaults to Maven's default of just src/main/clojure -->
+                <sourcePaths>
+                    <sourcePath>src/main/clojure</sourcePath>
+                </sourcePaths>
+
+                <!-- Defaults to Maven's default of just src/test/clojure -->
+                <testPaths>
+                    <testPath>src/test/clojure</testPath>
+                </testPaths>
+
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+
+
+### `deps.edn` goal
+
+Writes a `deps.edn` file that replicates each of the `clojure` goal execution configurations in the POM.
+They can then be directly run by the `clojure` CLI tools.
+The Maven goal runs during the `generate-resources` phase by default.
+```xml
+<plugin>
+    <groupId>vivid</groupId>
+    <artifactId>clojure-maven-plugin</artifactId>
+    <version>0.2.0</version>
+    <executions>
+        <execution>
+            <id>hello-wumpus</id>                     <!-- Each 'clojure' goal execution ID servers as the deps.edn alias -->
+            <goals><goal>clojure</goal></goals>
+            ...
+        </execution>
+        ...
+        <execution>
+            <goals>
+                <goal>deps.edn</goal>                 <!-- The vivid:clojure-maven-plugin deps.edn goal -->
+            </goals>
+            <configuration>
+
+                <!-- Optional. Specify where to write the file. If a directory, deps.edn will
+                     be written to that directory. Paths in deps.edn are written relative to
+                     Maven's $project.basedir -->
+                <pathname>../projects/deps.edn</pathname>
+
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+To run the `deps.edn` goal from the CLI:
+```bash
+$ mvn vivid:clojure-maven-plugin:deps.edn
+...
+[INFO] --- clojure-maven-plugin:0.2.0:deps.edn (default-cli) @ multiple-use-project ---
+[INFO] Wrote deps.edn
+```
+Continuing with the running example, the `deps.edn` file now has an `:alias` for `:hello-wumpus` that replicates the same classpath and options as its originating `clojure` Maven goal:
+```edn
+{:aliases {:hello-wumpus {:extra-paths ["src/main/clojure"
+                                        "target/classes"]
+                          :main-opts ["-m hello-wumpus.core"]
+                          :extra-deps {org.clojure/clojure {:mvn/version "1.10.1"}}}
+           ... }}
+```
+and can be run with:
+```bash
+$ clojure -A:hello-wumpus
+Hello from planet Irata!
+```
+Useful for bringing a build into other tooling for further work or experimentation.
+Now, wasn't that .. anticlimactic? And, boring? And time-saving? And effective? And reliable? Just like Maven..
+
+
+
 ### `leiningen` goal
 
 Execute Leiningen directly within Maven's running process.

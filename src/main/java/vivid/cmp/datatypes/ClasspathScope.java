@@ -12,7 +12,7 @@
  * the License.
  */
 
-package vivid.cmp.classpath;
+package vivid.cmp.datatypes;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -22,8 +22,14 @@ import static org.apache.maven.artifact.Artifact.SCOPE_COMPILE_PLUS_RUNTIME;
 import static org.apache.maven.artifact.Artifact.SCOPE_RUNTIME;
 import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
 
-public enum ClasspathScopes {
+/**
+ * Selects one of Maven's classpath scopes.
+ */
+public enum ClasspathScope {
 
+    NONE(
+            HashSet.empty()
+    ),
     COMPILE(
             HashSet.of(SCOPE_COMPILE, SCOPE_COMPILE_PLUS_RUNTIME, SCOPE_RUNTIME)
     ),
@@ -33,7 +39,7 @@ public enum ClasspathScopes {
 
     public final Set<String> effectiveScopes;
 
-    ClasspathScopes(final Set<String> effectiveScopes) {
+    ClasspathScope(final Set<String> effectiveScopes) {
         this.effectiveScopes = effectiveScopes;
     }
 

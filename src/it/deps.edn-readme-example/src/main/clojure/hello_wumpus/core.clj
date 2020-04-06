@@ -10,8 +10,10 @@
 ;; or implied. See the License for the specific language governing permissions and limitations under
 ;; the License.
 
-(ns hello-world)
+(ns hello-wumpus.core)
 
 (defn -main [& _]
-      (spit "hakidasu.txt" "Hello World\n")
-      (println "wrote hakidasu.txt"))
+    (let [message "Hello from planet Irata!\n"]
+      (print message)
+      (spit "hakidasu.txt" message)
+      (println "wrote hakidasu.txt")))

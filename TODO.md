@@ -18,6 +18,18 @@ Bind that to a Maven phase.
 Setup Clojars as a Maven repo and pluginRepo.
 Add a dependency to Clojure in your POM, or deps.edn.
 
+// TODO 'clojure.test & junit'
+
+// Referencing
+// https://github.com/cognitect-labs/test-runner/blob/master/deps.edn
+// https://oli.me.uk/clojure-and-clojurescript-testing-with-the-clojure-cli/
+// https://github.com/ingesolvoll/lein-maven-plugin
+// https://github.com/redbadger/test-report-junit-xml
+
+// Run the clojure.test tests.
+// Write JUnit report files.
+// Report results on console and back to Maven ala surefire.
+
 ### Implementation
 
-`clojure` goal, `clojure.test` runner, JUnit-style reporting. `write-deps-edn` goal. More integration tests.
+`clojure` goal, `clojure.test` runner, JUnit-style reporting. `deps.edn` goal. More integration tests.

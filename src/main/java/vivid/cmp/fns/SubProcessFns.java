@@ -12,7 +12,7 @@
  * the License.
  */
 
-package vivid.cmp.components;
+package vivid.cmp.fns;
 
 import io.vavr.collection.Stream;
 import org.apache.commons.exec.CommandLine;
@@ -27,9 +27,9 @@ import vivid.cmp.mojo.AbstractCMPMojo;
 import java.io.IOException;
 import java.util.Map;
 
-public class SubProcess {
+public class SubProcessFns {
 
-    private SubProcess() {
+    private SubProcessFns() {
         // Hide the public constructor
     }
 
@@ -63,7 +63,7 @@ public class SubProcess {
             commandLine.addArguments(args);
         }
 
-        SubProcess.exec(
+        SubProcessFns.exec(
                 mojo,
                 executor,
                 commandLine,

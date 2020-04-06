@@ -43,6 +43,9 @@
                   </goals>
                   <configuration>
                       <args>-m hello-world</args>
+                      <sourcePaths>
+                          <sourcePath>src/main/clojure</sourcePath>
+                      </sourcePaths>
                   </configuration>
               </execution>
           </executions>

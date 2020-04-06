@@ -30,21 +30,16 @@ import java.util.List;
 
 public abstract class AbstractCMPMojo extends AbstractMojo {
 
-    static final String DONT_MAKE_ME_THINK =
+    private static final String DONT_MAKE_ME_THINK =
             "Maintaining forward-compatibility with newer versions of vivid:clojure-maven-plugin " +
                     "is less cost and trouble for plugin users.";
     @Constant(rationale = DONT_MAKE_ME_THINK)
-    static final String POM_CMP_CLOJURE_MOJO_GOAL_NAME = "clojure";
+    static final String CLOJURE_MOJO_GOAL_NAME = "clojure";
     @Constant(rationale = DONT_MAKE_ME_THINK)
-    static final String POM_CMP_LEININGEN_GOAL_NAME = "leiningen";
+    static final String DEPS_EDN_MOJO_GOAL_NAME = "deps.edn";
     @Constant(rationale = DONT_MAKE_ME_THINK)
-    static final String POM_CMP_WRITE_DEPS_EDN_MOJO_GOAL_NAME = "write-deps-edn";
-    @Constant(rationale = DONT_MAKE_ME_THINK)
-    static final String POM_CMP_ARGS_PROPERTY_KEY = "args";
-    @Constant(rationale = DONT_MAKE_ME_THINK)
-    static final String POM_CMP_CLOJURE_EXECUTABLE_PROPERTY_KEY = "executable";
-    @Constant(rationale = DONT_MAKE_ME_THINK)
-    static final String POM_CMP_CLOJURE_SCOPE_PROPERTY_KEY = "mavenScope";
+    static final String LEININGEN_GOAL_NAME = "leiningen";
+
 
     //
     // Maven components

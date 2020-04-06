@@ -12,9 +12,11 @@
  * the License.
  */
 
-package vivid.cmp.components;
+package vivid.cmp.fns;
 
-import org.apache.maven.plugin.MojoExecutionException;
+import io.vavr.control.Either;
+import vivid.cmp.messages.Message;
+import vivid.cmp.messages.VCMPE1InternalError;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,27 +25,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Identifiers using CamelCase convention prevalent in Java and Maven
+ * The context within which these Maven goals are configured is Maven,
+ * identifiers use the CamelCase convention prevalent in Java and Maven
  * rather than dashed convention epitomized by Lisp.
  */
-public class Static {
+public class FileFns {
 
-    private Static() {
+    private FileFns() {
         // Hide the public constructor
     }
 
-    public static void writeFile(
+    public static Either<Message, Void> writeFile(
             final Path path,
             final Charset charset,
             final String content
-    ) throws MojoExecutionException {
+    ) {
         try (final BufferedWriter writer = Files.newBufferedWriter(
                 path,
                 charset
         )) {
             writer.write(content);
+            return Either.right(null);
         } catch (final IOException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+            return Either.left(
+                    VCMPE1InternalError.message(
+                            "Could not write file: " + path,
+                            e
+                    )
+            );
         }
     }
 
