@@ -49,16 +49,18 @@ public class ClojureMojoState {
 
     @Constant
     public static final String CLOJURE_SOURCEPATHS_PARAMETER_KEY = "sourcePaths";
+    /** Represented as a bare String so that it can be used as the Maven @Parameter defaultValue */
     @Constant(rationale = "Fixed at the conventional Maven directory path for Clojure source code")
-    static final List<String> CLOJURE_SOURCEPATHS_PROPERTY_DEFAULT_VALUE = List.of("src/main/clojure");
+    public static final String CLOJURE_SOURCEPATHS_PROPERTY_DEFAULT_VALUE = "src/main/clojure";
     @Constant
     public static final String CLOJURE_SOURCEPATH_PARAMETER_CHILDNAME_KEY = "sourcePath";
 
 
     @Constant
     public static final String CLOJURE_TESTPATHS_PARAMETER_KEY = "testPaths";
+    /** Represented as a bare String so that it can be used as the Maven @Parameter defaultValue */
     @Constant(rationale = "Fixed at the conventional Maven directory path for Clojure test code")
-    static final List<String> CLOJURE_TESTPATHS_PROPERTY_DEFAULT_VALUE = List.of("src/test/clojure");
+    public static final String CLOJURE_TESTPATHS_PROPERTY_DEFAULT_VALUE = "src/test/clojure";
     @Constant
     public static final String CLOJURE_TESTPATH_PARAMETER_CHILDNAME_KEY = "testPath";
 
@@ -73,8 +75,8 @@ public class ClojureMojoState {
             CLOJURE_ARGS_PROPERTY_DEFAULT_VALUE,
             CLOJURE_EXECUTABLE_PROPERTY_DEFAULT_VALUE,
             CLOJURE_CLASSPATHSCOPE_PROPERTY_DEFAULT_VALUE,
-            CLOJURE_SOURCEPATHS_PROPERTY_DEFAULT_VALUE,
-            CLOJURE_TESTPATHS_PROPERTY_DEFAULT_VALUE
+            List.of(CLOJURE_SOURCEPATHS_PROPERTY_DEFAULT_VALUE),
+            List.of(CLOJURE_TESTPATHS_PROPERTY_DEFAULT_VALUE)
     );
 
     public ClojureMojoState(

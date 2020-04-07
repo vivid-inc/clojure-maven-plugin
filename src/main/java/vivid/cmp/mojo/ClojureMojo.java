@@ -25,11 +25,15 @@ import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.fns.ClassPathology;
 import vivid.cmp.fns.SubProcessFns;
 
+import java.util.ArrayList;
+
 import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_ARGS_PARAMETER_KEY;
 import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_CLASSPATHSCOPE_PARAMETER_KEY;
 import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_EXECUTABLE_PARAMETER_KEY;
 import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_SOURCEPATHS_PARAMETER_KEY;
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_SOURCEPATHS_PROPERTY_DEFAULT_VALUE;
 import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_TESTPATHS_PARAMETER_KEY;
+import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_TESTPATHS_PROPERTY_DEFAULT_VALUE;
 
 /**
  * Executes 'clojure' as a sub-process with a variety of options.
@@ -102,15 +106,15 @@ public class ClojureMojo extends AbstractCMPMojo {
      * Specifies paths containing Clojure source code to be added to the
      * classpath for 'clojure'.
      */
-    @Parameter(property = CLOJURE_SOURCEPATHS_PROPERTY_KEY)
-    private String[] sourcePaths = ClojureMojoState.DEFAULT_STATE.sourcePaths.toJavaArray(String[]::new);
+    @Parameter(property = CLOJURE_SOURCEPATHS_PROPERTY_KEY, defaultValue = CLOJURE_SOURCEPATHS_PROPERTY_DEFAULT_VALUE)
+    private java.util.List<String> sourcePaths = new ArrayList<>();
 
     /**
      * Specifies paths containing Clojure test source code to be added to
      * the classpath for 'clojure'.
      */
-    @Parameter(property = CLOJURE_TESTPATHS_PROPERTY_KEY)
-    private String[] testPaths = ClojureMojoState.DEFAULT_STATE.testPaths.toJavaArray(String[]::new);
+    @Parameter(property = CLOJURE_TESTPATHS_PROPERTY_KEY, defaultValue = CLOJURE_TESTPATHS_PROPERTY_DEFAULT_VALUE)
+    private java.util.List<String> testPaths = new ArrayList<>();
 
 
     @SuppressWarnings("java:S5304")
@@ -123,8 +127,8 @@ public class ClojureMojo extends AbstractCMPMojo {
                 Option.of(args),
                 executable,
                 classpathScope,
-                List.of(sourcePaths),
-                List.of(testPaths)
+                List.ofAll(sourcePaths),
+                List.ofAll(testPaths)
         );
 
         // Execute 'clojure'

@@ -9,28 +9,28 @@
 Intentionally Spartan, it is specifically designed to wrangle those critters commonly found in Clojure- and Java-slinging development shops, likely the ones you are using now:
 
 - Apache Maven, the primary driver of your build.
-- Leiningen `project.clj` workflows in-process in Maven.
+- `clojure` CLI tooling and its `deps.edn` ecosystem.
+- Leiningen `project.clj` workflows.
 
 
 
 ## Usage
 
-First, ensure your Maven build targets Clojars for dependency and plugin resolution by adding this snippet:
-
+First, ensure your Maven build uses the Clojars repository for dependency and plugin resolution with this snippet:
 ```xml
 <repository>
     <id>clojars.org</id>
     <url>https://repo.clojars.org/</url>
 </repository>
 ```
-
-to each of the `<repositories>` and `<pluginRepositories>` sections in your `pom.xml`.
+in each of the `<repositories>` and `<pluginRepositories>` sections in the appropriate Maven
+configuration file, such as your `pom.xml`.
 
 
 
 ### `clojure` goal
 
-Execute's Clojure in a sub-process using the Maven project's classpath.
+Execute Clojure in a sub-process using the Maven project classpath.
 
 ```xml
 <plugin>
@@ -46,13 +46,13 @@ Execute's Clojure in a sub-process using the Maven project's classpath.
             </goals>
             <configuration>
 
-                <!-- Optional -->
+                <!-- Optional path to the clojure executable -->
                 <executable>clojure</executable>
 
-                <!-- Optional arguments to Clojure. If CLI app, use <![CDATA[ \-\- ]]> to pass args to the app. -->
+                <!-- Optional arguments to Clojure. CDATA might be necessary to handle dashes. -->
                 <args>release</args>
 
-                <!-- Defaults to COMPILE -->
+                <!-- Defaults to COMPILE. Other values are TEST and NONE. -->
                 <classpathScope>TEST</classpathScope>
 
                 <!-- Defaults to Maven's default of just src/main/clojure -->

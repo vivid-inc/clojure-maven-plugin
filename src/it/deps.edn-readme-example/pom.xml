@@ -43,9 +43,6 @@
                   </goals>
                   <configuration>
                       <args>-m hello-wumpus.core</args>
-                      <sourcePaths>
-                          <sourcePath>src/main/clojure</sourcePath>
-                      </sourcePaths>
                   </configuration>
               </execution>
               <execution>
