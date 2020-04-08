@@ -190,9 +190,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>vivid.cherimoya</groupId>
-            <artifactId>cherimoya</artifactId>
-            <version>1.0.0</version>
+            <groupId>vivid.polypara</groupId>
+            <artifactId>polypara-annotations</artifactId>
+            <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -377,9 +377,9 @@
             </plugin>
 
             <plugin>
-                <groupId>vivid.cherimoya</groupId>
-                <artifactId>cherimoya-maven-plugin</artifactId>
-                <version>0.3.0</version>
+                <groupId>vivid.polypara</groupId>
+                <artifactId>polypara-maven-plugin</artifactId>
+                <version>0.4.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -387,8 +387,6 @@
                         </goals>
                         <configuration>
                             <versions>
-                                <version>0.1.0</version>
-                                <version>0.2.0</version>
                                 <version>0.3.0</version>
                             </versions>
                         </configuration>

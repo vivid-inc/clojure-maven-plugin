@@ -26,13 +26,13 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import us.bpsm.edn.printer.Printers;
-import vivid.cherimoya.annotation.Constant;
 import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.datatypes.DepsEdn;
 import vivid.cmp.fns.ClojureMojoConfigurationFns;
 import vivid.cmp.fns.FileFns;
 import vivid.cmp.fns.MojoFns;
 import vivid.cmp.messages.Message;
+import vivid.polypara.annotation.Constant;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -64,7 +64,7 @@ public class DepsEdnMojo extends AbstractCMPMojo {
 
     @Constant
     private static final String DEPS_EDN_GOAL_PROPERTY_KEY_PREFIX =
-            AbstractCMPMojo.DEPS_EDN_MOJO_GOAL_NAME + ".";
+            CLOJURE_MAVEN_PLUGIN_ID + "." + DEPS_EDN_MOJO_GOAL_NAME + ".";
 
     @Constant
     private static final String DEPS_EDN_PATHNAME_PARAMETER_KEY = "pathname";

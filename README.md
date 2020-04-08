@@ -24,9 +24,7 @@ First, ensure your Maven build uses the Clojars repository for dependency and pl
 </repository>
 ```
 in each of the `<repositories>` and `<pluginRepositories>` sections in the appropriate Maven
-configuration file, such as your `pom.xml`.
-
-
+configuration, such as your `pom.xml`.
 
 ### `clojure` goal
 

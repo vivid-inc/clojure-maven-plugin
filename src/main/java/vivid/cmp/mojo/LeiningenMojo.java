@@ -22,9 +22,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import vivid.cherimoya.annotation.Constant;
 import vivid.cmp.fns.ClassPathology;
 import vivid.cmp.fns.MavenDependencyFns;
+import vivid.polypara.annotation.Constant;
 
 import java.io.IOException;
 
@@ -68,7 +68,7 @@ public class LeiningenMojo extends AbstractCMPMojo {
 
     @Constant
     private static final String CLOJURE_GOAL_PROPERTY_KEY_PREFIX =
-            AbstractCMPMojo.LEININGEN_GOAL_NAME + ".";
+            CLOJURE_MAVEN_PLUGIN_ID + "." + LEININGEN_GOAL_NAME + ".";
 
     @Constant
     private static final String LEININGEN_GOAL_ARGS_PROPERTY_KEY =

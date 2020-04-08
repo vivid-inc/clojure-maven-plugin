@@ -16,7 +16,7 @@ package vivid.cmp.datatypes;
 
 import io.vavr.collection.List;
 import io.vavr.control.Option;
-import vivid.cherimoya.annotation.Constant;
+import vivid.polypara.annotation.Constant;
 
 import java.util.function.Consumer;
 

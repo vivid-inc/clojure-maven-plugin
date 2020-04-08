@@ -23,8 +23,8 @@ import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.codehaus.plexus.i18n.I18N;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import vivid.cherimoya.annotation.Constant;
 import vivid.cmp.messages.I18nContext;
+import vivid.polypara.annotation.Constant;
 
 import java.util.List;
 
@@ -33,6 +33,8 @@ public abstract class AbstractCMPMojo extends AbstractMojo {
     private static final String DONT_MAKE_ME_THINK =
             "Maintaining forward-compatibility with newer versions of vivid:clojure-maven-plugin " +
                     "is less cost and trouble for plugin users.";
+    @Constant(rationale = DONT_MAKE_ME_THINK)
+    static final String CLOJURE_MAVEN_PLUGIN_ID = "clojure-maven-plugin";
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String CLOJURE_MOJO_GOAL_NAME = "clojure";
     @Constant(rationale = DONT_MAKE_ME_THINK)
