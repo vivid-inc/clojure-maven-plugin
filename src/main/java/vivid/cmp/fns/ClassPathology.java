@@ -62,6 +62,7 @@ public class ClassPathology {
                             url
                     )
             );
+            // TODO Also log for the first artifact
         }
 
         Thread.currentThread().setContextClassLoader(realm);

@@ -107,7 +107,10 @@ public class LeiningenMojo extends AbstractCMPMojo {
                     MavenDependencyFns.resolveArtifact(this, dependency),
                     MavenDependencyFns.resolveDependencies(this, dependency)
             );
-            lein(args);
+            lein(
+                    mavenSession.getCurrentProject().getBasedir().getAbsolutePath(),
+                    args
+            );
         } catch (final MojoFailureException e) {
             throw e;
         } catch (final Exception e) {
@@ -116,6 +119,7 @@ public class LeiningenMojo extends AbstractCMPMojo {
     }
 
     private static void lein(
+            final String cwd,
             final String args
     ) throws IOException {
         RT.loadResourceScript("vivid/cmp/leiningen.clj");
@@ -130,7 +134,7 @@ public class LeiningenMojo extends AbstractCMPMojo {
         Clojure.var("clojure.core", "require")
                 .invoke(Symbol.intern(VIVID_CLOJURE_MAVEN_PLUGIN_NS));
         Clojure.var(VIVID_CLOJURE_MAVEN_PLUGIN_NS, LEIN_MAIN_FN)
-                .invoke(args);
+                .invoke(cwd, args);
     }
 
 }
