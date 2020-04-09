@@ -14,6 +14,9 @@
 
 package vivid.cmp.fns;
 
+import io.vavr.Function1;
+import io.vavr.Function3;
+import io.vavr.collection.List;
 import io.vavr.collection.Stream;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -49,24 +52,28 @@ public class ClassPathology {
                 Thread.currentThread().getContextClassLoader()
         );
 
-        realm.addURL(
-                artifact.getArtifact().getFile().toURI().toURL() // TODO add to stream
-        );
+        final List<File> artifactFiles =
+                List.of(artifact.getArtifact().getFile())
+                .appendAll(List.ofAll(artifacts).map(a -> a.getArtifact().getFile()));
+        final Function1<URL, Void> add = addURLToRealm.apply(mojo, realm);
 
-        for (final ArtifactResult a : artifacts) {
-            final URL url = a.getArtifact().getFile().toURI().toURL();
-            realm.addURL(url);
-            mojo.getLog().debug(
-                    String.format(
-                            "Adding to new ClassRealm: %s",
-                            url
-                    )
-            );
-            // TODO Also log for the first artifact
+        for (final File f : artifactFiles) {
+            add.apply(f.toURI().toURL());
         }
 
         Thread.currentThread().setContextClassLoader(realm);
     }
+
+    private static final Function3<AbstractCMPMojo, ClassRealm, URL, Void> addURLToRealm =
+            (mojo, realm, url) -> {
+                realm.addURL(url);
+                mojo.getLog().debug(
+                        String.format(
+                                "Added to ClassRealm: %s",
+                                url
+                        ));
+                return null;
+            };
 
     public static Stream<String> getClassPathForScope(
             final AbstractCMPMojo mojo,

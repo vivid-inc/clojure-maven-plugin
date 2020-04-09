@@ -17,15 +17,19 @@ package vivid.cmp.mojo;
 import clojure.java.api.Clojure;
 import clojure.lang.RT;
 import clojure.lang.Symbol;
+import io.vavr.Tuple;
+import io.vavr.collection.List;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import vivid.cmp.fns.ClassPathology;
+import vivid.cmp.fns.FileFns;
 import vivid.cmp.fns.MavenDependencyFns;
 import vivid.polypara.annotation.Constant;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -83,8 +87,11 @@ public class LeiningenMojo extends AbstractCMPMojo {
     // User-provided configuration
     //
 
-    @Parameter(required = true, property = LEININGEN_GOAL_ARGS_PROPERTY_KEY)
+    @Parameter(property = LEININGEN_GOAL_ARGS_PROPERTY_KEY)
     private String args;
+
+    @Parameter(property = LEININGEN_GOAL_ARGS_PROPERTY_KEY, defaultValue = "false") // TODO default to Mavens -X CLI flag value
+    private boolean debug;
 
     @Parameter(required = true, property = LEININGEN_GOAL_VERSION_PROPERTY_KEY)
     private String version;
@@ -94,6 +101,8 @@ public class LeiningenMojo extends AbstractCMPMojo {
     public void execute()
             throws MojoExecutionException, MojoFailureException {
         super.initialize();
+
+        final String cwd = mavenSession.getCurrentProject().getBasedir().getAbsolutePath();
 
         final Dependency dependency = MavenDependencyFns.newDependency(
                 LEININGEN_LIB_DEPENDENCY_MAVEN_G_A,
@@ -107,10 +116,24 @@ public class LeiningenMojo extends AbstractCMPMojo {
                     MavenDependencyFns.resolveArtifact(this, dependency),
                     MavenDependencyFns.resolveDependencies(this, dependency)
             );
-            lein(
-                    mavenSession.getCurrentProject().getBasedir().getAbsolutePath(),
-                    args
-            );
+
+            getLog().debug("Invoking Leiningen:");
+            List.of(
+                    Tuple.of("version", version),
+                    Tuple.of("cwd", cwd),
+                    Tuple.of("args", args)
+            )
+                    .forEach(t -> getLog().debug(
+                            String.format("  %s = %s", t._1, t._2)
+                    ));
+
+            try (final Closeable ignored =
+                         new FileFns.UserDirSystemPropertyOverride(this, cwd)) {
+                lein(
+                        debug,
+                        args
+                );
+            }
         } catch (final MojoFailureException e) {
             throw e;
         } catch (final Exception e) {
@@ -119,7 +142,7 @@ public class LeiningenMojo extends AbstractCMPMojo {
     }
 
     private static void lein(
-            final String cwd,
+            final boolean debug,
             final String args
     ) throws IOException {
         RT.loadResourceScript("vivid/cmp/leiningen.clj");
@@ -129,12 +152,12 @@ public class LeiningenMojo extends AbstractCMPMojo {
         // (clojure.core/require vivid.cmp.leiningen)
         // (vivid.cmp.leiningen/lein-main task)
 
-        // .. in its Java equivalent:
+        // .. expressed in Java:
         //
         Clojure.var("clojure.core", "require")
                 .invoke(Symbol.intern(VIVID_CLOJURE_MAVEN_PLUGIN_NS));
         Clojure.var(VIVID_CLOJURE_MAVEN_PLUGIN_NS, LEIN_MAIN_FN)
-                .invoke(cwd, args);
+                .invoke(debug, args);
     }
 
 }

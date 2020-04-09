@@ -162,6 +162,13 @@ Faster and less resource-intensive than running `lein` in a sub-process.
 </plugin>
 ```
 
+_Current working directory_:
+For the duration of an invocation of Leiningen, both `user.dir` and Leiningen's own `leiningen.core.main/*cwd*` var are
+set to the Maven module's `basedir`, giving Leiningen and its various tasks the information they need to correctly
+determine the current working directory.
+Afterwards `user.dir` is restored to its prior value.
+Portions of a Leiningen run might express ill behavior with file paths in the context of a Maven multi-module build;
+tasks must account for `user.dir`.
 
 
 ## Development

@@ -11,9 +11,10 @@
                      {:exit-code exit-code :suppress-msg (empty? msg)}))))
   ([] (exit 0)))
 
-(defn lein-main [cwd args]
+(defn lein-main [debug? args]
   (let [raw-args (re-seq #"[^\s]+" args)]
+    (when debug?
+      (alter-var-root #'lein/*debug* (constantly true)))
     (alter-var-root #'lein/*exit-process?* (constantly false))
-    (alter-var-root #'lein/*cwd* (constantly cwd))
     (with-redefs [lein/exit exit]
       (apply lein/-main raw-args))))

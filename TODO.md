@@ -29,7 +29,17 @@ Add a dependency to Clojure in your POM, or deps.edn.
 // Run the clojure.test tests.
 // Write JUnit report files.
 // Report results on console and back to Maven ala surefire.
+// set <skip> defaultValue to ${maven.test.skip}
 
 ### Implementation
 
 `clojure` goal, `clojure.test` runner, JUnit-style reporting. `deps.edn` goal. More integration tests.
+
+
+/*
+ * Design notes:
+ *
+ * The context within which these Maven goals are configured is Maven, wherein
+ * identifiers use the CamelCase convention prevalent in Java and Maven
+ * rather than the lisp-case convention natural to Clojure.
+ */
