@@ -88,8 +88,8 @@ public class DepsEdnMojo extends AbstractCMPMojo {
     // User-provided configuration
     //
 
-    @Parameter(property = DEPS_EDN_PATHNAME_PROPERTY_KEY)
-    private String pathname = DEPS_EDN_PATHNAME_PROPERTY_DEFAULT_VALUE;
+    @Parameter(defaultValue = DEPS_EDN_PATHNAME_PROPERTY_DEFAULT_VALUE, property = DEPS_EDN_PATHNAME_PROPERTY_KEY)
+    private String pathname;
 
 
     @Override
@@ -114,7 +114,7 @@ public class DepsEdnMojo extends AbstractCMPMojo {
         if (result.isRight()) {
             getLog().info(
                     i18nContext.getText(
-                            "vivid.clojure-maven-plugin.action.wrote-deps-edn",
+                            "vivid.clojure-maven-plugin.action.wrote",
                             pathname
                     )
             );

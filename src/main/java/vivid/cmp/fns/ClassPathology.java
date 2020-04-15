@@ -41,8 +41,7 @@ public class ClassPathology {
     @SuppressWarnings("java:S2095")
     public static void addToClassLoader(
             final AbstractCMPMojo mojo,
-            final org.eclipse.aether.resolution.ArtifactResult artifact,
-            final Iterable<ArtifactResult> artifacts
+            final List<File> files
     ) throws DuplicateRealmException, MalformedURLException {
         // Referencing https://webtide.com/extending-the-maven-plugin-classpath-at-runtime/
 
@@ -52,12 +51,9 @@ public class ClassPathology {
                 Thread.currentThread().getContextClassLoader()
         );
 
-        final List<File> artifactFiles =
-                List.of(artifact.getArtifact().getFile())
-                .appendAll(List.ofAll(artifacts).map(a -> a.getArtifact().getFile()));
         final Function1<URL, Void> add = addURLToRealm.apply(mojo, realm);
 
-        for (final File f : artifactFiles) {
+        for (final File f : files) {
             add.apply(f.toURI().toURL());
         }
 

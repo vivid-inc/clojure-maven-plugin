@@ -5,12 +5,14 @@
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=vivid-inc_clojure-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=vivid-inc_clojure-maven-plugin)
 
 
-`clojure-maven-plugin` conveniently integrates Clojure tooling into your Maven builds.
+`clojure-maven-plugin` conveniently integrates Clojure tooling and processing steps into your Maven builds.
 Intentionally Spartan, it is specifically designed to wrangle those critters commonly found in Clojure- and Java-slinging development shops, likely the ones you are using now:
 
 - Apache Maven, the primary driver of your build.
 - `clojure` CLI tooling and its `deps.edn` ecosystem.
 - Leiningen `project.clj` workflows.
+
+This plugin doesn't offer any new packaging type such as `clojure`.
 
 
 
@@ -68,6 +70,14 @@ Execute Clojure in a sub-process using the Maven project classpath.
     </executions>
 </plugin>
 ```
+
+
+
+### `clojure.test` goal
+
+__Skip tests__ by setting the `skip` parameter to true.
+Also honors the `maven.test.skip` parameter and `-Dclojure-maven-plugin.clojure.test.skip=true`.
+
 
 
 
@@ -181,17 +191,38 @@ bin/test.sh
 
 *Motivation*: Among the methods of integration Clojure tooling into Maven, none provided the integrative experience of IntelliJ (Maven classpath) and CI (JUnit reporting).
 
+### TODO
+
+Note the following in the README:
+
+- The `clojure` CLI command and its `deps.edn` system.
+- Optional `clojure.test` execution and Maven build breaking behavior.
+- Optional JUnit-style test reporting output, compatible with virtually all Java-savvy Continuous Integration systems.
+
+
+### `clojure` goal
+Include Clojure code into a Maven project that is not of type `clojure`.
+So, you have some Clojure code or test code that needs access to the classpath assembled by Maven; this plugin does just that.
+Structure your Clojure code or `clojure.test` code around [`deps.edn`](https://clojure.org/reference/deps_and_cli).
+Add the Maven plugin to your POM.
+Set the goal in the POM.
+`clojure` needs to be on the path, or alternatively specify a path using `clojureExecutable`.
+Optionally provide args.
+Bind that to a Maven phase.
+Setup Clojars as a Maven repo and pluginRepo.
+Add a dependency to Clojure in your POM, or deps.edn.
+
 
 
 ## License and Attributions
 
 This project is licensed under the [Apache License Version 2.0](LICENSE.txt), modulo portions derived from these donors:
 
-- [Inge Solvoll's `lein-maven-plugin`](https://github.com/ingesolvoll/lein-maven-plugin), MIT License.
-  [Attribution](src/main/resources/licenses/LICENSE-ingesolvoll-lein-maven-plugin.txt).
-- [Talios' `clojure-maven-plugin`](https://github.com/talios/clojure-maven-plugin), Eclipse Public License - v 1.0.
-  [Attribution](src/main/resources/licenses/LICENSE-talios-clojure-maven-plugin.html).
-
-
+- Inge Solvoll [`lein-maven-plugin`](https://github.com/ingesolvoll/lein-maven-plugin).
+  [MIT License](https://raw.githubusercontent.com/ingesolvoll/lein-maven-plugin/d86e5ded9c75018b26c99ff041f3dad7079d3d1a/LICENSE).
+- James Reeves [`eftest`](https://github.com/weavejester/eftest).
+  [Eclipse Public License 1.0](https://raw.githubusercontent.com/weavejester/eftest/43a41b28e5981382a93503be27bce463e1b6ad4f/README.md).
+- Talios [`clojure-maven-plugin`](https://github.com/talios/clojure-maven-plugin).
+  [Eclipse Public License 1.0](https://raw.githubusercontent.com/talios/clojure-maven-plugin/8ce0d7dab93a418cfba0bcf68943c31291bcdc23/epl-v10.html).
 
 © Copyright Vivid Inc.

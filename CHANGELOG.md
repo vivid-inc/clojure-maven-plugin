@@ -2,6 +2,7 @@
 
 ## [0.3.0]
 __Unreleased__
+- CMP became cognizant of the need to manage the `user.dir` Java system property.
 
 ## [0.2.0]
 - `clojure` and `deps.edn` goals

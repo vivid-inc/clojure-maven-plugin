@@ -30,6 +30,7 @@ import vivid.cmp.fns.MavenDependencyFns;
 import vivid.polypara.annotation.Constant;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -66,7 +67,7 @@ public class LeiningenMojo extends AbstractCMPMojo {
 
     private static final String LEININGEN_LIB_DEPENDENCY_MAVEN_G_A = "leiningen";
 
-    private static final String VIVID_CLOJURE_MAVEN_PLUGIN_NS = "vivid.cmp.leiningen";
+    private static final String VIVID_CMP_LEININGEN_NS = "vivid.cmp.leiningen";
     private static final String LEIN_MAIN_FN = "lein-main";
 
 
@@ -113,8 +114,7 @@ public class LeiningenMojo extends AbstractCMPMojo {
         try {
             ClassPathology.addToClassLoader(
                     this,
-                    MavenDependencyFns.resolveArtifact(this, dependency),
-                    MavenDependencyFns.resolveDependencies(this, dependency)
+                    MavenDependencyFns.resolveToFiles(this, dependency)
             );
 
             getLog().debug("Invoking Leiningen:");
@@ -155,8 +155,8 @@ public class LeiningenMojo extends AbstractCMPMojo {
         // .. expressed in Java:
         //
         Clojure.var("clojure.core", "require")
-                .invoke(Symbol.intern(VIVID_CLOJURE_MAVEN_PLUGIN_NS));
-        Clojure.var(VIVID_CLOJURE_MAVEN_PLUGIN_NS, LEIN_MAIN_FN)
+                .invoke(Symbol.intern(VIVID_CMP_LEININGEN_NS));
+        Clojure.var(VIVID_CMP_LEININGEN_NS, LEIN_MAIN_FN)
                 .invoke(debug, args);
     }
 

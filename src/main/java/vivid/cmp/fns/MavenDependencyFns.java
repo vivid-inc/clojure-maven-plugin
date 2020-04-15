@@ -33,6 +33,7 @@ import vivid.cmp.datatypes.ClasspathScope;
 import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.mojo.AbstractCMPMojo;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -70,6 +71,12 @@ public class MavenDependencyFns {
             System.exit(1);
             return null;
         }
+    }
+
+    public static Predicate<Dependency> inScopeP(
+            final ClasspathScope classpathScope
+    ) {
+        return dependency -> classpathScope.effectiveScopes.contains(dependency.getScope());
     }
 
     public static Dependency newDependency(
@@ -144,6 +151,15 @@ public class MavenDependencyFns {
         return dependencyArtifacts;
     }
 
+    public static io.vavr.collection.List<File> resolveToFiles(
+            final AbstractCMPMojo mojo,
+            final Dependency dependency
+    ) throws ArtifactResolutionException, DependencyResolverException, MojoFailureException {
+        return io.vavr.collection.List
+                .of(MavenDependencyFns.resolveArtifact(mojo, dependency).getArtifact().getFile())
+                .appendAll(io.vavr.collection.List.ofAll(MavenDependencyFns.resolveDependencies(mojo, dependency)).map(a -> a.getArtifact().getFile()));
+    }
+
     public static DefaultArtifact toArtifact(
             final Dependency dependency
     ) {
@@ -156,12 +172,6 @@ public class MavenDependencyFns {
                         dependency.getVersion()
                 )
         );
-    }
-
-    public static Predicate<Dependency> inScopeP(
-            final ClasspathScope classpathScope
-    ) {
-        return dependency -> classpathScope.effectiveScopes.contains(dependency.getScope());
     }
 
 }

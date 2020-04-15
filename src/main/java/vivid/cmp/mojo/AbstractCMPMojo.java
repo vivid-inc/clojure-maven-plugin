@@ -33,10 +33,14 @@ public abstract class AbstractCMPMojo extends AbstractMojo {
     private static final String DONT_MAKE_ME_THINK =
             "Maintaining forward-compatibility with newer versions of vivid:clojure-maven-plugin " +
                     "is less cost and trouble for plugin users.";
+
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String CLOJURE_MAVEN_PLUGIN_ID = "clojure-maven-plugin";
+
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String CLOJURE_MOJO_GOAL_NAME = "clojure";
+    @Constant(rationale = DONT_MAKE_ME_THINK)
+    static final String CLOJURE_TEST_MOJO_GOAL_NAME = "clojure.test";
     @Constant(rationale = DONT_MAKE_ME_THINK)
     static final String DEPS_EDN_MOJO_GOAL_NAME = "deps.edn";
     @Constant(rationale = DONT_MAKE_ME_THINK)
@@ -74,6 +78,7 @@ public abstract class AbstractCMPMojo extends AbstractMojo {
      * this method as soon as possible.
      */
     protected void initialize() {
+        // TODO Find how to make this automatic so that sub-classers need not explicility invoke this.
         i18nContext = new I18nContext(i18n);
     }
 
