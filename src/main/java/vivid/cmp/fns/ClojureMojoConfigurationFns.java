@@ -40,47 +40,58 @@ public class ClojureMojoConfigurationFns {
         // Hide the public constructor
     }
 
-    private static Function2<String, Xpp3Dom, List<String>> getChildrenValues =
+    private static final Function2<String, Xpp3Dom, List<String>> getChildrenValues =
             (childName, dom) -> Stream.of(dom.getChildren())
                     .filter(child -> childName.equalsIgnoreCase(child.getName()))
                     .map(Xpp3Dom::getValue)
                     .toList();
 
-    private static Function2<Either<Message, ClojureMojoState>, Xpp3Dom, Either<Message, ClojureMojoState>>
+    private static final Function2<Either<Message, Option<ClojureMojoState>>, Xpp3Dom, Either<Message, Option<ClojureMojoState>>>
             updateInPlaceClojureMojoState =
-            (state, dom) -> {
-                if (state.isLeft()) {
-                    return state;
+            (stateOption, dom) -> {
+                if (stateOption.isLeft()) {
+                    return stateOption;
+                }
+                if (stateOption.get().isEmpty()) {
+                    return Either.right(Option.none());
                 }
                 final String key = dom.getName();
+                final ClojureMojoState state = stateOption.get().get();
+
                 switch (key) {
                     case CLOJURE_ARGS_PARAMETER_KEY:
-                        return Either.right(state.get().setArgs(Option.of(dom.getValue())));
+                        return Either.right(Option.of(state.setArgs(Option.of(dom.getValue()))));
                     case CLOJURE_EXECUTABLE_PARAMETER_KEY:
-                        return Either.right(state.get().setExecutable(dom.getValue()));
+                        return Either.right(Option.of(state.setExecutable(dom.getValue())));
                     case CLOJURE_CLASSPATHSCOPE_PARAMETER_KEY:
-                        return Either.right(state.get().setClasspathScope(
-                                ClasspathScope.valueOf(dom.getValue()))
-                        );
+                        return Either.right(Option.of(state.setClasspathScope(
+                                ClasspathScope.valueOf(dom.getValue())
+                                )));
                     case CLOJURE_SOURCEPATHS_PARAMETER_KEY:
-                        return Either.right(state.get().setSourcePaths(
-                                getChildrenValues.apply(CLOJURE_SOURCEPATH_PARAMETER_CHILDNAME_KEY, dom))
-                        );
+                        return Either.right(Option.of(state.setSourcePaths(
+                                getChildrenValues.apply(CLOJURE_SOURCEPATH_PARAMETER_CHILDNAME_KEY, dom)
+                                )));
                     case CLOJURE_TESTPATHS_PARAMETER_KEY:
-                        return Either.right(state.get().setTestPaths(
+                        return Either.right(Option.of(state.setTestPaths(
                                 getChildrenValues.apply(CLOJURE_TESTPATH_PARAMETER_CHILDNAME_KEY, dom))
-                        );
+                        ));
                     default:
                         // Ignore this unknown field
                         // TODO log.debug(): "Unknown " + ClojureMojoState.class.getName() + " field name: " + key
-                        return state;
+                        return stateOption;
                 }
             };
 
-    public static Either<Message, ClojureMojoState> asClojureMojoState(
+    public static Either<Message, Option<ClojureMojoState>> asClojureMojoState(
             final PluginExecution pluginExecution
     ) {
+        if (pluginExecution == null) {
+            return Either.right(Option.none());
+        }
         final Object untyped = pluginExecution.getConfiguration();
+        if (untyped == null) {
+            return Either.right(Option.of(ClojureMojoState.DEFAULT_STATE));
+        }
         if (!(untyped instanceof Xpp3Dom)) {
             return Either.left(
                     VCMPE1InternalError.message(
@@ -93,7 +104,7 @@ public class ClojureMojoConfigurationFns {
         return
                 Stream.of(((Xpp3Dom) untyped).getChildren())
                         .foldLeft(
-                                Either.right(ClojureMojoState.DEFAULT_STATE),
+                                Either.right(Option.of(ClojureMojoState.DEFAULT_STATE)),
                                 updateInPlaceClojureMojoState
                         );
     }

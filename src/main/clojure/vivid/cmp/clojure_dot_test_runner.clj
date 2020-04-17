@@ -36,6 +36,12 @@
   [message]
   (.. *mojo* (getLog) (info message)))
 
+(defn i18n-get-text
+  [key & args]
+  (let [i18n-context (.i18nContext *mojo*)]
+    (.getText i18n-context key (into-array Object args))))
+
+
 
 ;
 ; clojure.test -compatible reporting
@@ -56,15 +62,15 @@
           :type)
 
 (defmethod cmp-report :default [data]
-  (if (= :begin-test-ns (:type data))
-    (do
-      (log-info (str "Running " (ns-name (:ns data))))))
+  (when (= :begin-test-ns (:type data))
+    (log-info (i18n-get-text "vivid.clojure-maven-plugin.action.running-test"
+                             (ns-name (:ns data)))))
   (eftest.report.pretty/report data)
   (with-context-writer
     (eftest.report.junit/report data)))
 
 (defn format-interval [duration]
-  (format "%.3f seconds" (double (/ duration 1e3))))
+  (format "%.3f s" (double (/ duration 1e3))))
 
 (defmethod cmp-report :summary [{:keys [test pass fail error duration]}]
   (let [total (+ pass fail error)
@@ -73,17 +79,18 @@
                  [log-info io.aviso.ansi/bold-green-font]
                  [log-error io.aviso.ansi/bold-red-font])
         summary [""
-                 "Results:"
+                 (i18n-get-text "vivid.clojure-maven-plugin.phrase.results")
                  ""
-                 (format (str "%sTests run: %d, "
-                              "Assertions: %d, Failures: %d, Errors: %d%s, "
-                              "Time elapsed: %s")
-                         color test
-                         ; Note: The total assertions, failures, and error counts are
-                         ; are double-counted as the combined effect of running both
-                         ; the pretty-printer and the JUnit output reporting functions.
-                         (/ total 2) (/ fail 2) (/ error 2) io.aviso.ansi/reset-font
-                         (format-interval duration))
+                 (format
+                   (i18n-get-text "vivid.clojure-maven-plugin.action.test-run-summary-format"
+                                  test
+                                  ; Note: The total assertions, failures, and error counts are
+                                  ; are double-counted as the combined effect of running both
+                                  ; the pretty-printer and the JUnit output reporting functions.
+                                  (/ total 2) (/ fail 2) (/ error 2)
+                                  (format-interval duration))
+                   color
+                   io.aviso.ansi/reset-font)
                  ""]]
     (when-not all-tests-passed
       ; Ensure at least one blank line separates the non-passing
@@ -99,11 +106,6 @@
 ;
 ; Test runner
 ;
-
-(defn i18n-get-text
-  [key & args]
-  (let [i18n-context (.i18nContext *mojo*)]
-    (.getText i18n-context key args)))
 
 (defn found-tests
   [xs]
@@ -128,12 +130,14 @@
   [^AbstractCMPMojo mojo ^Map options]
   (binding [*context* (atom {})
             *mojo* mojo]
-    (let [junit-report-pathname (.get options "junit-report-filename")]
+    (let [junit-report-pathname (.get options "junit-report-filename")
+          multithread (.get options "multithread")]
       (io/make-parents (io/file junit-report-pathname))
       (swap! *context* assoc :writer (io/writer junit-report-pathname))
       (let [results (some-> (eftest.runner/find-tests "src/test/clojure")    ; TODO pass path as an option
                             (found-tests)
-                            (eftest.runner/run-tests {:report cmp-report}))
+                            (eftest.runner/run-tests {:multithread? multithread
+                                                      :report cmp-report}))
             writer ^Writer (get @*context* :writer)]
         (.close writer)
         (swap! *context* dissoc :writer)

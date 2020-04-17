@@ -1,4 +1,4 @@
-(ns non-passing-test
+(ns failure-test
   "Exercises each kind of non-passing test."
   (:require [clojure.test :refer :all]))
 
@@ -18,3 +18,7 @@
          (are [x y] (= x y)
               0 (+ 1 1)
               0 (* 2 3)))
+
+(deftest diff
+         (is (= {:bar 2 :foo 1}
+                {:bar 3 :foo 1})))

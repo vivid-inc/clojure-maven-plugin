@@ -18,7 +18,6 @@ import io.vavr.Function1;
 import io.vavr.Function3;
 import io.vavr.collection.List;
 import io.vavr.collection.Stream;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;

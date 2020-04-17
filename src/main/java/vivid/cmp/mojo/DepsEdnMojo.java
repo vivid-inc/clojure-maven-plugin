@@ -14,21 +14,13 @@
 
 package vivid.cmp.mojo;
 
-import io.vavr.collection.Map;
-import io.vavr.collection.Stream;
-import io.vavr.collection.TreeMap;
 import io.vavr.control.Either;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import us.bpsm.edn.printer.Printers;
-import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.datatypes.DepsEdn;
-import vivid.cmp.fns.ClojureMojoConfigurationFns;
 import vivid.cmp.fns.FileFns;
 import vivid.cmp.fns.MojoFns;
 import vivid.cmp.messages.Message;
@@ -37,7 +29,6 @@ import vivid.polypara.annotation.Constant;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.BiFunction;
 
 /**
  * Writes a 'deps.edn' file containing equivalents to the execution configuration of
@@ -76,15 +67,6 @@ public class DepsEdnMojo extends AbstractCMPMojo {
 
 
     //
-    // Maven components
-    //
-
-    @Parameter(defaultValue = "${plugin}", readonly = true, required = true)
-    private PluginDescriptor pluginDescriptor;
-
-
-
-    //
     // User-provided configuration
     //
 
@@ -100,8 +82,12 @@ public class DepsEdnMojo extends AbstractCMPMojo {
         // TODO Calculate the common :deps, :paths to reduce duplication in the :alias es
 
         final Either<Message, Object> result =
-                myPluginExecutionConfigurations()
-                        .map(x -> DepsEdn.create(this, x))
+                MojoFns.myPluginExecutionConfigurations(
+                        this,
+                        pluginDescriptor.getPluginLookupKey(),
+                        AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME
+                )
+                        .map(configs -> DepsEdn.create(this, configs))
                         .map(edn -> Printers.printString(
                                 Printers.prettyPrinterProtocol(),
                                 edn
@@ -126,9 +112,9 @@ public class DepsEdnMojo extends AbstractCMPMojo {
     }
 
     /**
-     * {@param pathname} can specify any valid path. In the case of a directory,
-     * this appends the filename  "deps.edn" and returns a path to the file within
-     * the directory.
+     * {@param pathname} can specify any valid path to a {@code deps.edn} file.
+     * If {@param pathname} points to a directory, this returns a path to the
+     * default filename of "deps.edn" within the directory.
      */
     private static Path depsEdnPath(
             final String pathname
@@ -137,42 +123,6 @@ public class DepsEdnMojo extends AbstractCMPMojo {
         return p.toFile().isDirectory() ?
                 p.resolve(DEPS_EDN_PATHNAME_PROPERTY_DEFAULT_VALUE) :
                 p;
-    }
-
-    private Either<Message, Map<String, ClojureMojoState>> myPluginExecutionConfigurations() {
-        final Plugin myself = mavenSession.getCurrentProject().getPlugin(
-                pluginDescriptor.getPluginLookupKey()
-        );
-        return
-                Stream.ofAll(myself.getExecutions())
-                        .filter(MojoFns.hasGoalOfName(AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME))
-                        .foldLeft(
-                                Either.right(TreeMap.empty()),
-                                mappedPluginExecutionStateCombinator()
-                        );
-    }
-
-    private static BiFunction<
-            Either<Message, Map<String, ClojureMojoState>>,
-            PluginExecution,
-            Either<Message, Map<String, ClojureMojoState>>>
-    mappedPluginExecutionStateCombinator() {
-        return (m, pluginExecution) -> {
-            if (m.isLeft()) {
-                return m;
-            }
-            final Either<Message, ClojureMojoState> state =
-                    ClojureMojoConfigurationFns.asClojureMojoState(pluginExecution);
-            if (state.isLeft()) {
-                return Either.left(state.getLeft());
-            }
-            return Either.right(
-                    m.get().put(
-                            pluginExecution.getId(),
-                            state.get()
-                    )
-            );
-        };
     }
 
 }

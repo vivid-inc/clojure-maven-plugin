@@ -4,7 +4,7 @@
 
 (defn- exit
   ([exit-code & msg]
-   (when-not (= exit-code 0)
+   (when-not (zero? exit-code)
      (throw (ex-info (if (seq msg)
                        (apply print-str msg)
                        "Suppressed exit")

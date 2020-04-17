@@ -14,4 +14,9 @@
 
 def buildLog = new File(basedir, "build.log")
 assert buildLog.exists()
+
+// Surefire
+assert buildLog.text.contains("INFO] No tests to run.")
+
+// CMP
 assert buildLog.text.contains("[INFO] No tests were found")

@@ -21,26 +21,29 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.fns.ClassPathology;
 import vivid.cmp.fns.MavenDependencyFns;
+import vivid.cmp.fns.MojoFns;
 import vivid.cmp.messages.Message;
 import vivid.cmp.messages.VCMPE1InternalError;
+import vivid.cmp.messages.VCMPE3ItemNotFound;
+import vivid.cmp.messages.VCMPE4IndeterminateExecutionId;
 import vivid.polypara.annotation.Constant;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import static vivid.cmp.datatypes.ClojureMojoState.CLOJURE_ARGS_PARAMETER_KEY;
 
 /**
- * Runs clojure.test tests and reports results with JUnit-compatible output.
+ * Runs clojure.test tests and reports results with JUnit-compatible output,
+ * similar to maven-surefire-plugin.
  *
  * @since 0.3.0
  */
@@ -56,10 +59,16 @@ public class ClojureTestMojo extends AbstractCMPMojo {
             CLOJURE_MAVEN_PLUGIN_ID + "." + CLOJURE_TEST_MOJO_GOAL_NAME + ".";
 
     @Constant
-    private static final String CLOJURE_TEST_NAMESPACES_PARAMETER_KEY = "namespaces";
+    private static final String CLOJURE_TEST_CLOJUREGOALEXECUTIONID_PARAMETER_KEY = "clojureGoalExecutionId";
     @Constant
-    private static final String CLOJURE_TEST_NAMESPACES_PROPERTY_KEY =
-            CLOJURE_TEST_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_ARGS_PARAMETER_KEY;
+    private static final String CLOJURE_TEST_CLOJUREGOALEXECUTIONID_PROPERTY_KEY =
+            CLOJURE_TEST_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_TEST_CLOJUREGOALEXECUTIONID_PARAMETER_KEY;
+
+    @Constant
+    private static final String CLOJURE_TEST_MULTITHREAD_PARAMETER_KEY = "multithread";
+    @Constant
+    private static final String CLOJURE_TEST_MULTITHREAD_PROPERTY_KEY =
+            CLOJURE_TEST_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_TEST_MULTITHREAD_PARAMETER_KEY;
 
     @Constant
     private static final String CLOJURE_TEST_SKIP_PARAMETER_KEY = "skip";
@@ -67,43 +76,54 @@ public class ClojureTestMojo extends AbstractCMPMojo {
     private static final String CLOJURE_TEST_SKIP_PROPERTY_KEY =
             CLOJURE_TEST_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_TEST_SKIP_PARAMETER_KEY;
 
+    @Constant
+    private static final String CLOJURE_TEST_TESTFAILUREIGNORE_PARAMETER_KEY = "testFailureIgnore";
+    @Constant
+    private static final String CLOJURE_TEST_TESTFAILUREIGNORE_PROPERTY_KEY =
+            CLOJURE_TEST_GOAL_PROPERTY_KEY_PREFIX + CLOJURE_TEST_TESTFAILUREIGNORE_PARAMETER_KEY;
+
 
     //
     // User-provided configuration
     //
 
     /**
-     * ID of a {@code clojure} goal
+     * Runs tests with the dependency and path settings of a specific {@code clojure}
+     * goal, specified by its execution ID.
+     *
+     * @since 0.3.0
      */
-    @Parameter
-    private String clojureConfigurationId;
+    @Parameter(property = CLOJURE_TEST_CLOJUREGOALEXECUTIONID_PROPERTY_KEY)
+    private String clojureGoalExecutionId;
 
+    /**
+     * Controls eftest's multithread setting. eftest by default runs tests in parallel,
+     * but this goal mimics maven-surefire-plugin's default setting of serial execution.
+     * Set to {@code true} to run your tests in parallel.
+     *
+     * @since 0.3.0
+     */
+    @Parameter(defaultValue = "false", property = CLOJURE_TEST_MULTITHREAD_PROPERTY_KEY)
+    private boolean multithread;
+
+    /**
+     * The test run will be skipped when {@code true}.
+     *
+     * @since 0.3.0
+     */
     @Parameter(defaultValue = "${maven.test.skip}", property = CLOJURE_TEST_SKIP_PROPERTY_KEY)
     private boolean skip;
 
-
-
-
-
-
-    // TODO maven.test.failure.ignore
-
-    // TODO maven configuration id of clojure configuration to build
-
-    // read with Clojure read-string. symbols, regexes, fns.
-//    @Parameter(property = CLOJURE_TEST_NAMESPACES_PROPERTY_KEY)
-//    private java.util.List<String> namespaces = new ArrayList<>();
-    // TODO namespace symbol, regex matching ns, metadata-keywords (think "labels")
-    // TODO choose by fn (for exclusion)
-
-    // TODO Run compilation & QA checks on Clojure code
-
-
-
-
-
-
-
+    /**
+     * When {@code true}, doesn't report failure back to Maven when not all tests pass.
+     *
+     * @since 0.3.0
+     */
+    @Parameter(
+            defaultValue = "${maven.test.failure.ignore}",
+            property = CLOJURE_TEST_TESTFAILUREIGNORE_PROPERTY_KEY
+    )
+    private boolean testFailureIgnore;
 
 
     private static final Dependency eftestDependency = MavenDependencyFns.newDependency(
@@ -112,6 +132,39 @@ public class ClojureTestMojo extends AbstractCMPMojo {
             "0.5.9"
     );
 
+
+    /**
+     * Uses a 'clojure' goal execution ID if specified, uses the default if none are defined,
+     * use the singular configuration if defined, otherwise gives up.
+     */
+    private static Either<Message, ClojureMojoState> selectClojureMojoConfig(
+            final Map<String, ClojureMojoState> configs,
+            final String executionId
+    ) {
+        if (executionId != null) {
+            final Option<ClojureMojoState> a = configs.get(executionId);
+            return a.toEither(VCMPE3ItemNotFound.message(
+                    String.format(
+                            "'%s' goal execution ID '%s'",
+                            AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME,
+                            executionId
+                    )
+            ));
+        }
+        if (configs.isEmpty()) {
+            return Either.right(ClojureMojoState.DEFAULT_STATE);
+        }
+        if (configs.size() == 1) {
+            return Either.right(configs.get()._2);
+        }
+        // At this point, configs.size() >= 2
+        return Either.left(VCMPE4IndeterminateExecutionId.message(
+                CLOJURE_TEST_CLOJUREGOALEXECUTIONID_PARAMETER_KEY,
+                AbstractCMPMojo.CLOJURE_TEST_MOJO_GOAL_NAME,
+                AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME,
+                configs.keySet()
+        ));
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -127,54 +180,47 @@ public class ClojureTestMojo extends AbstractCMPMojo {
             return;
         }
 
-        final Map<String, String> options = HashMap.of(
-                "junit-report-filename", mavenSession.getCurrentProject().getBuild().getDirectory() + "/clojure-test-reports/all-tests.xml"
+        final Either<Message, ClojureMojoState> selectedConfig = MojoFns.myPluginExecutionConfigurations(
+                this,
+                pluginDescriptor.getPluginLookupKey(),
+                AbstractCMPMojo.CLOJURE_MOJO_GOAL_NAME
+        )
+                .flatMap(configs -> selectClojureMojoConfig(configs, clojureGoalExecutionId));
+        if (selectedConfig.isLeft()) {
+            throw new MojoFailureException(
+                    selectedConfig.getLeft().render(this)
+            );
+        }
+        final ClojureMojoState clojureMojoState = selectedConfig.get();
+
+        final Map<String, Object> testRunnerOptions = HashMap.of(
+                "junit-report-filename", mavenSession.getCurrentProject().getBuild().getDirectory() + "/clojure-test-reports/all-tests.xml",
+                CLOJURE_TEST_MULTITHREAD_PARAMETER_KEY, multithread
         );
 
         try {
-            final List<File> x = List
-                    .of(new File(System.getProperty("user.dir"), "src/test/clojure")) // TODO
-                    .appendAll(MavenDependencyFns.resolveToFiles(this, eftestDependency))
-                    ;
-            ClassPathology.addToClassLoader(this, x);
+            ClassPathology.addToClassLoader(
+                    this,
+                    List
+                            .ofAll(clojureMojoState.sourcePaths)
+                            .appendAll(clojureMojoState.testPaths)
+                            .map(File::new)
+                            .appendAll(MavenDependencyFns.resolveToFiles(this, eftestDependency))
+            );
         } catch (final Exception e) {
             throw new MojoExecutionException(
-                    "classloader",
+                    VCMPE1InternalError.message("Unexpected exception while adding to classloader path").render(this),
                     e
             );
         }
-        final Either<Message, Object> res = clojureDotTestRunner(this, options);
-        if (res.isLeft()) {
-            throw new MojoFailureException(
-                    "problemo",
-                    res.getLeft().getCause().get()
-            );
-        }
 
-        final Object r = res.get();
-        if (!(r instanceof Boolean)) {
-            throw new MojoExecutionException(
-                    VCMPE1InternalError.message("Unexpected result type returned from Clojure")
-                            .render(this)
-            );
-        }
-        final boolean allTestsPassed = (Boolean) r;
-        if (!allTestsPassed) {
-            throw new MojoFailureException("There are test failures.\n\n" +
-                    "Please refer to " + options.getOrElse("junit-report-filename", "the build output directory") + " for the individual test results.");
-        }
-
-
-        //     While in Clojure-land, output to getLog()
-        //     Report results back to Java mojo
-        // Write test summary
-        // Output the JUnit report file where Maven and CI tools can expect it
-        // Return back to Maven, possibly a test failure or error
+        final Either<Message, Object> res = clojureDotTestRunner(this, testRunnerOptions);
+        translateTestResultToMaven(this, res, testFailureIgnore, testRunnerOptions);
     }
 
     private static Either<Message, Object> clojureDotTestRunner(
             final AbstractCMPMojo mojo,
-            final Map<String, String> eftestOptions
+            final Map<String, Object> eftestOptions
     ) {
         try {
             RT.loadResourceScript("vivid/cmp/clojure_dot_test_runner.clj");
@@ -194,6 +240,42 @@ public class ClojureTestMojo extends AbstractCMPMojo {
                     "Could not run test runner",
                     e
             ));
+        }
+    }
+
+    private static void translateTestResultToMaven(
+            final ClojureTestMojo mojo,
+            final Either<Message, Object> testResult,
+            final boolean testFailureIgnore,
+            final Map<String, Object> testRunnerOptions
+    ) throws MojoExecutionException, MojoFailureException {
+        if (testResult.isLeft()) {
+            throw new MojoFailureException(
+                    testResult.getLeft().render(mojo),
+                    testResult.getLeft().getCause().get()
+            );
+        }
+
+        final Object r = testResult.get();
+        if (!(r instanceof Boolean)) {
+            throw new MojoExecutionException(
+                    VCMPE1InternalError.message("Unexpected result type returned from vivid/cmp/clojure_dot_test_runner.clj")
+                            .render(mojo)
+            );
+        }
+
+        final boolean allTestsPassed = (Boolean) r;
+        if (!allTestsPassed) {
+            if (testFailureIgnore) {
+                mojo.getLog().debug(CLOJURE_TEST_TESTFAILUREIGNORE_PROPERTY_KEY + " = true; ignoring negative test result");
+            } else {
+                throw new MojoFailureException(
+                        mojo.i18nContext.getText(
+                                "vivid.clojure-maven-plugin.action.test-failures",
+                                testRunnerOptions.getOrElse("junit-report-filename", "the build output directory")
+                        )
+                );
+            }
         }
     }
 

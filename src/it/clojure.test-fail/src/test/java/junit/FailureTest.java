@@ -1,4 +1,4 @@
-package sample;
+package junit;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Demonstrates surefire's behavior with JUnit, useful for comparing and contrasting
  * behavior and console output with that of vivid:clojure-maven-plugin:clojure.test
  */
-class FailingTest {
+class FailureTest {
 
     @Test
     void fail() {

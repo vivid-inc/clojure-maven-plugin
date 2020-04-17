@@ -8,7 +8,9 @@ import vivid.cmp.mojo.AbstractCMPMojo;
  */
 public interface Message {
 
-    Option<Exception> getCause();
+    default Option<Exception> getCause() {
+        return Option.none();
+    }
 
     String render(
             final AbstractCMPMojo mojo

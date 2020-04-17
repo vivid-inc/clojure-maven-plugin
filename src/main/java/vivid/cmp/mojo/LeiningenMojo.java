@@ -30,7 +30,6 @@ import vivid.cmp.fns.MavenDependencyFns;
 import vivid.polypara.annotation.Constant;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 
 /**

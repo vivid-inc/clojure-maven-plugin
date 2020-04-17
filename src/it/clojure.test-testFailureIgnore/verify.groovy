@@ -15,4 +15,7 @@
 def buildLog = new File(basedir, "build.log")
 assert buildLog.exists()
 
-assert buildLog.text.contains("[INFO] clojure-maven-plugin.clojure.test.skip = true; Skipping test run")
+assert buildLog.text.contains("BUILD SUCCESS")
+
+def junitReportXml = new File (basedir, "target/clojure-test-reports/all-tests.xml")
+assert junitReportXml.exists()

@@ -15,4 +15,5 @@
 def buildLog = new File(basedir, "build.log")
 assert buildLog.exists()
 
-assert buildLog.text.contains("[INFO] clojure-maven-plugin.clojure.test.skip = true; Skipping test run")
+assert buildLog.text.contains("BUILD FAILURE")
+assert buildLog.text.contains("VCMPE-3: Did not find 'clojure' goal execution ID 'i-do-not-exist'")

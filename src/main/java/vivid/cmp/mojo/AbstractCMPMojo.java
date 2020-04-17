@@ -17,6 +17,7 @@ package vivid.cmp.mojo;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
@@ -59,16 +60,19 @@ public abstract class AbstractCMPMojo extends AbstractMojo {
 
     protected I18nContext i18nContext;
 
-    @Parameter(required = true, readonly = true, property = "session")
+    @Parameter(readonly = true, required = true, property = "session")
     public MavenSession mavenSession;
+
+    @Parameter(defaultValue = "${plugin}", readonly = true, required = true)
+    public PluginDescriptor pluginDescriptor;
 
     @Component
     public RepositorySystem repositorySystem;
 
-    @Parameter(required = true, readonly = true, property = "repositorySystemSession")
+    @Parameter(readonly = true, required = true, property = "repositorySystemSession")
     public RepositorySystemSession repositorySystemSession;
 
-    @Parameter(required = true, readonly = true, property = "project.remoteArtifactRepositories")
+    @Parameter(readonly = true, required = true, property = "project.remoteArtifactRepositories")
     public List<ArtifactRepository> remoteRepositories;
 
 
