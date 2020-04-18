@@ -19,6 +19,7 @@ import io.vavr.collection.Set;
 
 import static org.apache.maven.artifact.Artifact.SCOPE_COMPILE;
 import static org.apache.maven.artifact.Artifact.SCOPE_COMPILE_PLUS_RUNTIME;
+import static org.apache.maven.artifact.Artifact.SCOPE_PROVIDED;
 import static org.apache.maven.artifact.Artifact.SCOPE_RUNTIME;
 import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
 
@@ -31,10 +32,10 @@ public enum ClasspathScope {
             HashSet.empty()
     ),
     COMPILE(
-            HashSet.of(SCOPE_COMPILE, SCOPE_COMPILE_PLUS_RUNTIME, SCOPE_RUNTIME)
+            HashSet.of(SCOPE_COMPILE, SCOPE_COMPILE_PLUS_RUNTIME, SCOPE_PROVIDED, SCOPE_RUNTIME)
     ),
     TEST(
-            HashSet.of(SCOPE_COMPILE, SCOPE_COMPILE_PLUS_RUNTIME, SCOPE_RUNTIME, SCOPE_TEST)
+            HashSet.of(SCOPE_COMPILE, SCOPE_COMPILE_PLUS_RUNTIME, SCOPE_PROVIDED, SCOPE_RUNTIME, SCOPE_TEST)
     );
 
     public final Set<String> effectiveScopes;

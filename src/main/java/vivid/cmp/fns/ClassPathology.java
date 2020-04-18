@@ -73,7 +73,8 @@ public class ClassPathology {
     public static Stream<String> getClassPathForScope(
             final AbstractCMPMojo mojo,
             final ClojureMojoState state,
-            boolean includeTransitiveDependencies
+            boolean includeTransitiveDependencies,
+            final PathStyle pathStyle
     ) {
         return Stream
                 .ofAll(state.sourcePaths)
@@ -82,9 +83,10 @@ public class ClassPathology {
                 )
                 .appendAll(
                         state.classpathScope == ClasspathScope.TEST ?
-                                Stream.ofAll(state.testPaths)
-                                        .append(mojo.mavenSession().getCurrentProject().getBuild().getOutputDirectory())
-                                : Stream.empty()
+                                Stream
+                                        .ofAll(state.testPaths)
+                                        .append(mojo.mavenSession().getCurrentProject().getBuild().getTestOutputDirectory()) :
+                                Stream.empty()
                 )
                 .appendAll(
                         includeTransitiveDependencies ?
@@ -96,17 +98,28 @@ public class ClassPathology {
                                 Stream.empty()
                 )
                 .map(
-                        relativePath(mojo.mavenSession().getCurrentProject().getBasedir().toPath())
+                        pathInStyle(
+                                mojo.mavenSession().getCurrentProject().getBasedir().toPath(),
+                                pathStyle
+                        )
                 );
     }
 
-    private static Function<String, String> relativePath(
-            final Path base
+    public enum PathStyle {
+        ABSOLUTE,
+        RELATIVE
+    }
+
+    private static Function<String, String> pathInStyle(
+            final Path base,
+            final PathStyle pathStyle
     ) {
-        return fileStr -> base
-                .toAbsolutePath()
-                .relativize( new File(fileStr).toPath().toAbsolutePath() )
-                .toString();
+        return fileStr -> {
+            final Path path = new File(fileStr).toPath().toAbsolutePath();
+            return pathStyle == PathStyle.RELATIVE ?
+                    base.toAbsolutePath().relativize( path ).toString() :
+                    path.toString();
+        };
     }
 
 }

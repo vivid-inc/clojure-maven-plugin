@@ -28,6 +28,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import vivid.cmp.datatypes.ClasspathScope;
 import vivid.cmp.datatypes.ClojureMojoState;
 import vivid.cmp.fns.ClassPathology;
 import vivid.cmp.fns.MavenDependencyFns;
@@ -191,7 +192,8 @@ public class ClojureTestMojo extends AbstractCMPMojo {
                     selectedConfig.getLeft().render(this)
             );
         }
-        final ClojureMojoState clojureMojoState = selectedConfig.get();
+        final ClojureMojoState clojureMojoState = selectedConfig.get()
+                .setClasspathScope(ClasspathScope.TEST);
 
         final Map<String, Object> testRunnerOptions = HashMap.of(
                 "junit-report-filename", mavenSession.getCurrentProject().getBuild().getDirectory() + "/clojure-test-reports/all-tests.xml",
@@ -202,8 +204,12 @@ public class ClojureTestMojo extends AbstractCMPMojo {
             ClassPathology.addToClassLoader(
                     this,
                     List
-                            .ofAll(clojureMojoState.sourcePaths)
-                            .appendAll(clojureMojoState.testPaths)
+                            .ofAll(ClassPathology.getClassPathForScope(
+                                    this,
+                                    clojureMojoState,
+                                    true,
+                                    ClassPathology.PathStyle.ABSOLUTE
+                            ))
                             .map(File::new)
                             .appendAll(MavenDependencyFns.resolveToFiles(this, eftestDependency))
             );

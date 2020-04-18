@@ -69,7 +69,7 @@ public class DepsEdn {
                         //Stream<String> paths
                         new Tuple2<Keyword, Object>(
                                 Keyword.newKeyword("extra-paths"),
-                                ClassPathology.getClassPathForScope(mojo, state, false).toJavaList()
+                                ClassPathology.getClassPathForScope(mojo, state, false, ClassPathology.PathStyle.RELATIVE).toJavaList()
                         )
                 ),
                 Option.of(

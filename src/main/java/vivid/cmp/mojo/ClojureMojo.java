@@ -146,7 +146,9 @@ public class ClojureMojo extends AbstractCMPMojo {
                 ClassPathology.getClassPathForScope(
                         this,
                         state,
-                        true),
+                        true,
+                        ClassPathology.PathStyle.RELATIVE
+                ),
 
                 // The sub-process inherits the same environment variables
                 // as the executing Maven process

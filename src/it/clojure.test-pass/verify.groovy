@@ -16,7 +16,7 @@ def buildLog = new File(basedir, "build.log")
 assert buildLog.exists()
 assert buildLog.text.contains("[INFO] Running nested.ns-test")
 assert buildLog.text.contains("[INFO] Running clojure-test-api-sorezore-test")
-assert buildLog.text.contains("[INFO] Tests run: 13, Assertions: 26, Failures: 0, Errors: 0, Time elapsed:")
+assert buildLog.text.contains("[INFO] Tests run: 14, Assertions: 27, Failures: 0, Errors: 0, Time elapsed:")
 assert buildLog.text.contains("[INFO] BUILD SUCCESS")
 
 def junitReportXml = new File (basedir, "target/clojure-test-reports/all-tests.xml")
