@@ -81,22 +81,14 @@
         <repository>
             <id>maven-central</id>
             <url>https://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <releases><enabled>true</enabled><checksumPolicy>warn</checksumPolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>clojars.org</id>
             <url>https://repo.clojars.org/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <releases><enabled>true</enabled><checksumPolicy>warn</checksumPolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
     </repositories>
 
@@ -106,22 +98,14 @@
         <pluginRepository>
             <id>maven-central</id>
             <url>https://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <releases><enabled>true</enabled><checksumPolicy>warn</checksumPolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>clojars.org</id>
             <url>https://repo.clojars.org/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <releases><enabled>true</enabled><checksumPolicy>warn</checksumPolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
     </pluginRepositories>
 
@@ -428,8 +412,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <!-- TODO src/it/clojure.test-fail/pom.xml fails correctly, but its failure fails the whole build.
-                         .disabled until I learn how to coax Maven into accepting the BUILD FAILURE. -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
                         <version>3.2.1</version>

@@ -1,8 +1,8 @@
 # Design notes
 
 * The context within which these Maven goals are configured is Maven, wherein
-* identifiers use the CamelCase convention prevalent in Java and Maven
-* rather than the lisp-case convention natural to Clojure.
+  identifiers use the CamelCase convention prevalent in Java and Maven
+  rather than the lisp-case convention natural to Clojure.
 
 
 ## Comparison of in-process and sub process execution

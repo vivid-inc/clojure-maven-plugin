@@ -2,6 +2,7 @@
 
 ## [0.3.0]
 __Unreleased__
+- `clojure.test` goal
 - CMP became cognizant of the need to manage the `user.dir` Java system property.
 
 ## [0.2.0]

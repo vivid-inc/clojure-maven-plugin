@@ -5,8 +5,15 @@
   ; - To help your IDE load the project more completely.
   ; - Afford various checks at the CLI, such as "lein ancient".
 
-  :aliases {"qa-check" ["do" "version," "kibit"]}
-  :dependencies [[eftest/eftest "0.5.9" :scope "provided"]
+  :aliases {"qa-check" ["do"
+                        "version,"
+                        "kibit"
+
+                        ; TODO CLI version: clj -Sdeps '{:deps {clj-kondo {:mvn/version "RELEASE"}}}' -m clj-kondo.main --lint src
+                        ;"run" "-m" "clj-kondo.main" "--lint" "src"
+                        ]}
+  :dependencies [                                           ;[clj-kondo "RELEASE"]
+                 [eftest/eftest "0.5.9" :scope "provided"]
                  [leiningen/leiningen "2.9.3" :scope "provided"]
                  [org.clojure/clojure "1.10.1" :scope "provided"]]
   :exclusions [org.clojure/clojure]

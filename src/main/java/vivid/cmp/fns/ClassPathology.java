@@ -73,7 +73,7 @@ public class ClassPathology {
     public static Stream<String> getClassPathForScope(
             final AbstractCMPMojo mojo,
             final ClojureMojoState state,
-            boolean includeTransitiveDependencies,
+            final boolean includeTransitiveDependencies,
             final PathStyle pathStyle
     ) {
         return Stream

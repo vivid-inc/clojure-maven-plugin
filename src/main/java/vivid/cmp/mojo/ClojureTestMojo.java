@@ -228,6 +228,12 @@ public class ClojureTestMojo extends AbstractCMPMojo {
             final AbstractCMPMojo mojo,
             final Map<String, Object> eftestOptions
     ) {
+        mojo.getLog().debug(
+                String.format(
+                        "Running Clojure tests with options: %s",
+                        eftestOptions
+                )
+        );
         try {
             RT.loadResourceScript("vivid/cmp/clojure_dot_test_runner.clj");
 

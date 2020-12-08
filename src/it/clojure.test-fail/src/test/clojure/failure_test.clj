@@ -1,6 +1,6 @@
 (ns failure-test
   "Exercises each kind of non-passing test."
-  (:require [clojure.test :refer :all]))
+  (:require [clojure.test :refer [are deftest is]]))
 
 (deftest false-assertion
          (is (= :yes :no)))

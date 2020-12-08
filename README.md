@@ -1,4 +1,5 @@
-  # Vivid Clojure Maven Plugin
+![Vivid Clojure Maven Plugin][1]
+
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat-square)](LICENSE.txt)
 [![Current version](https://img.shields.io/clojars/v/vivid/clojure-maven-plugin.svg?color=blue&style=flat-square)](https://clojars.org/vivid/clojure-maven-plugin)
 [![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.3.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
@@ -30,7 +31,7 @@ configuration, such as your `pom.xml`.
 
 ### `clojure` goal
 
-Execute Clojure in a sub-process using the Maven project classpath.
+Execute the CLI `clojure` command in a sub-process using the Maven project classpath.
 
 ```xml
 <plugin>
@@ -52,7 +53,8 @@ Execute Clojure in a sub-process using the Maven project classpath.
                 <!-- Optional arguments to Clojure. CDATA might be necessary to handle dashes. -->
                 <args>release</args>
 
-                <!-- Defaults to COMPILE. Other values are TEST and NONE. -->
+                <!-- Maven classpath scope provided to `clojure`.
+                     Defaults to COMPILE. Other values are TEST and NONE. -->
                 <classpathScope>TEST</classpathScope>
 
                 <!-- Defaults to Maven's default of just src/main/clojure -->
@@ -83,7 +85,7 @@ Also honors the `maven.test.skip` parameter and `-Dclojure-maven-plugin.clojure.
 
 ### `deps.edn` goal
 
-Writes a `deps.edn` file that replicates each of the `clojure` goal execution configurations in the POM.
+Writes a [`deps.edn`](https://clojure.org/reference/deps_and_cli) file that replicates each of the `clojure` goal execution configurations in the POM.
 They can then be directly run by the `clojure` CLI tools.
 The Maven goal runs during the `generate-resources` phase by default.
 ```xml
@@ -152,7 +154,7 @@ Faster and less resource-intensive than running `lein` in a sub-process.
     <executions>
         <execution>
             <id>leiningen-release-build</id>         <!-- Each execution requires a unique ID -->
-            <phase>compile</phase>                   <!-- Tie goal execution to the desired Maven phase -->
+            <phase>compile</phase>                   <!-- Bind goal execution to the desired Maven phase -->
             <goals>
                 <goal>leiningen</goal>               <!-- The vivid:clojure-maven-plugin Leiningen goal -->
             </goals>
@@ -191,28 +193,6 @@ bin/test.sh
 
 *Motivation*: Among the methods of integration Clojure tooling into Maven, none provided the integrative experience of IntelliJ (Maven classpath) and CI (JUnit reporting).
 
-### TODO
-
-Note the following in the README:
-
-- The `clojure` CLI command and its `deps.edn` system.
-- Optional `clojure.test` execution and Maven build breaking behavior.
-- Optional JUnit-style test reporting output, compatible with virtually all Java-savvy Continuous Integration systems.
-
-
-### `clojure` goal
-Include Clojure code into a Maven project that is not of type `clojure`.
-So, you have some Clojure code or test code that needs access to the classpath assembled by Maven; this plugin does just that.
-Structure your Clojure code or `clojure.test` code around [`deps.edn`](https://clojure.org/reference/deps_and_cli).
-Add the Maven plugin to your POM.
-Set the goal in the POM.
-`clojure` needs to be on the path, or alternatively specify a path using `clojureExecutable`.
-Optionally provide args.
-Bind that to a Maven phase.
-Setup Clojars as a Maven repo and pluginRepo.
-Add a dependency to Clojure in your POM, or deps.edn.
-
-
 
 ## License and Attributions
 
@@ -226,3 +206,5 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
   [Eclipse Public License 1.0](https://raw.githubusercontent.com/talios/clojure-maven-plugin/8ce0d7dab93a418cfba0bcf68943c31291bcdc23/epl-v10.html).
 
 © Copyright Vivid Inc.
+
+[1]:https://raw.githubusercontent.com/vivid-inc/clojure-maven-plugin/release-0.3.0/assets/vivid-clojure-maven-plugin-logo.svg

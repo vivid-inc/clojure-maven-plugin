@@ -1,6 +1,7 @@
 (ns clojure-test-api-sorezore-test
   "Exercises much of the clojure.test API. All tests pass."
-  (:require [clojure.test :refer :all]))
+  (:require
+    [clojure.test :refer [are deftest is testing with-test]]))
 
 (deftest equality
   (is (= 1 1))

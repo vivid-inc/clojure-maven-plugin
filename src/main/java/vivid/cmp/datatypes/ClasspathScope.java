@@ -28,6 +28,8 @@ import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
  */
 public enum ClasspathScope {
 
+    // TODO See if POM configurations can refer to these using lowercase strings, maybe by implementing toString() here.
+
     NONE(
             HashSet.empty()
     ),
