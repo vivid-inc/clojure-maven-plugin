@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat-square)](LICENSE.txt)
 [![Current version](https://img.shields.io/clojars/v/vivid/clojure-maven-plugin.svg?color=blue&style=flat-square)](https://clojars.org/vivid/clojure-maven-plugin)
 [![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.3.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
-[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=vivid-inc_clojure-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=vivid-inc_clojure-maven-plugin)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=clojure-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=clojure-maven-plugin)
 
 
 `clojure-maven-plugin` conveniently integrates Clojure tooling and processing steps into your Maven builds.
@@ -207,4 +207,4 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 
 © Copyright Vivid Inc.
 
-[1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.3.0/assets/artwork/vivid-clojure-maven-plugin-logo.svg?raw=true
+[1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.3.0/assets/artwork/vivid-clojure-maven-plugin-logo.png?raw=true
