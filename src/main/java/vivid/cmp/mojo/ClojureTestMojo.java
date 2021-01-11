@@ -230,7 +230,7 @@ public class ClojureTestMojo extends AbstractCMPMojo {
     ) {
         mojo.getLog().debug(
                 String.format(
-                        "Running Clojure tests with options: %s",
+                        "Running Clojure tests with eftest options: %s",
                         eftestOptions
                 )
         );

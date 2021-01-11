@@ -207,4 +207,4 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 
 © Copyright Vivid Inc.
 
-[1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.3.0/assets/artwork/vivid-clojure-maven-plugin-logo.png?raw=true
+[1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.3.0/assets/artwork/vivid-clojure-maven-plugin-logo.svg?raw=true

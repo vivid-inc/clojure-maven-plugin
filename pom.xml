@@ -80,7 +80,7 @@
              perfect, and not Clojars which by definition has what maven-central doesn't. -->
         <repository>
             <id>maven-central</id>
-            <url>https://repo1.maven.org/maven2</url>
+	    <url>https://repo.maven.apache.org/maven2</url>
             <releases><enabled>true</enabled><checksumPolicy>warn</checksumPolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
@@ -97,7 +97,7 @@
              perfect, and not Clojars which by definition has what maven-central doesn't. -->
         <pluginRepository>
             <id>maven-central</id>
-            <url>https://repo1.maven.org/maven2</url>
+	    <url>https://repo.maven.apache.org/maven2</url>
             <releases><enabled>true</enabled><checksumPolicy>warn</checksumPolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
