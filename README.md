@@ -205,6 +205,8 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 - Talios [`clojure-maven-plugin`](https://github.com/talios/clojure-maven-plugin).
   [Eclipse Public License 1.0](https://raw.githubusercontent.com/talios/clojure-maven-plugin/8ce0d7dab93a418cfba0bcf68943c31291bcdc23/epl-v10.html).
 
+- CMP logo illustration by [ei8htz](https://ei8htz.tumblr.com/).
+
 © Copyright Vivid Inc.
 
 [1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.3.0/assets/artwork/vivid-clojure-maven-plugin-logo.svg?raw=true
