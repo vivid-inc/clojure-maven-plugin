@@ -6,24 +6,23 @@
   ; - Afford various checks at the CLI, such as "lein ancient".
 
   :aliases {"qa-check" ["do"
-                        "version,"
-                        "kibit"
-
-                        ; TODO CLI version: clj -Sdeps '{:deps {clj-kondo {:mvn/version "RELEASE"}}}' -m clj-kondo.main --lint src
-                        ;"run" "-m" "clj-kondo.main" "--lint" "src"
-                        ]}
-  :dependencies [                                           ;[clj-kondo "RELEASE"]
-                 [eftest/eftest "0.5.9" :scope "provided"]
+                        ["version"]]
+            ; NOTE: clj-kondo fails, because it tries to compile the Java code without its dependencies.
+            "clj-kondo" ["with-profile" "clj-kondo" "run" "-m" "clj-kondo.main" "--" "--lint" "src/main/clojure"]}
+  :dependencies [[eftest/eftest "0.5.9" :scope "provided"]
                  [leiningen/leiningen "2.9.3" :scope "provided"]
                  [org.clojure/clojure "1.10.1" :scope "provided"]]
   :exclusions [org.clojure/clojure]
   :java-source-paths ["src/main/java"]
   :javac-options ["-target" "1.8"]
-  :plugins
-  ; Note: eastwood, yagni fail due to the Java code's dependencies being out of reach to them.
-  [[lein-ancient "0.6.15"]
-   [lein-kibit "0.1.6"]
-   [lein-nvd "1.1.0" :exclusions [org.slf4j/jcl-over-slf4j]]]
+  :manifest {"Built-By" "vivid"}
+  :plugins [[lein-ancient "0.6.15"]
+            [lein-cljfmt "0.7.0"]
+            [lein-ns-dep-graph "0.2.0-SNAPSHOT" :exclusions [org.clojure/clojure]]
+            [lein-nvd "1.1.0" :exclusions [org.slf4j/jcl-over-slf4j]]]
+  :profiles {:clj-kondo {:dependencies [[org.clojure/clojure "1.9.0"]
+                                        [clj-kondo "RELEASE"]]}}
+  :scm {:name "git" :url "https://github.com/vivid-inc/clojure-maven-plugin"}
   :source-paths ["src/main/clojure"]
   :target-path "target/%s"
 
