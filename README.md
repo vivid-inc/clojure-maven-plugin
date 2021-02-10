@@ -2,11 +2,11 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat-square)](LICENSE.txt)
 [![Current version](https://img.shields.io/clojars/v/vivid/clojure-maven-plugin.svg?color=blue&style=flat-square)](https://clojars.org/vivid/clojure-maven-plugin)
-[![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.3.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
+[![CircleCI build status](https://circleci.com/gh/vivid-inc/clojure-maven-plugin/tree/release-0.4.0.svg)](https://circleci.com/gh/vivid-inc/clojure-maven-plugin)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=clojure-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=clojure-maven-plugin)
 
 
-`clojure-maven-plugin` conveniently integrates Clojure tooling and processing steps into your Maven builds.
+Vivid's `clojure-maven-plugin` conveniently integrates Clojure tooling and processing steps into your Maven builds.
 Intentionally Spartan, it is specifically designed to wrangle those critters commonly found in Clojure- and Java-slinging development shops, likely the ones you are using now:
 
 - Apache Maven, the primary driver of your build.
@@ -37,7 +37,7 @@ Execute the CLI `clojure` command in a sub-process using the Maven project class
 <plugin>
     <groupId>vivid</groupId>
     <artifactId>clojure-maven-plugin</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <executions>
         <execution>
             <id>leiningen-release-build</id>         <!-- Each execution requires a unique ID -->
@@ -87,12 +87,12 @@ Also honors the `maven.test.skip` parameter and `-Dclojure-maven-plugin.clojure.
 
 Writes a [`deps.edn`](https://clojure.org/reference/deps_and_cli) file that replicates each of the `clojure` goal execution configurations in the POM.
 They can then be directly run by the `clojure` CLI tools.
-The Maven goal runs during the `generate-resources` phase by default.
+By default this Maven goal runs during the `generate-resources` phase.
 ```xml
 <plugin>
     <groupId>vivid</groupId>
     <artifactId>clojure-maven-plugin</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <executions>
         <execution>
             <id>hello-wumpus</id>                     <!-- Each 'clojure' goal execution ID servers as the deps.edn alias -->
@@ -120,7 +120,7 @@ To run the `deps.edn` goal from the CLI:
 ```bash
 $ mvn vivid:clojure-maven-plugin:deps.edn
 ...
-[INFO] --- clojure-maven-plugin:0.3.0:deps.edn (default-cli) @ multiple-use-project ---
+[INFO] --- clojure-maven-plugin:0.4.0:deps.edn (default-cli) @ multiple-use-project ---
 [INFO] Wrote deps.edn
 ```
 Continuing with the running example, the `deps.edn` file now has an `:alias` for `:hello-wumpus` that replicates the same classpath and options as its originating `clojure` Maven goal:
@@ -150,7 +150,7 @@ Faster and less resource-intensive than running `lein` in a sub-process.
 <plugin>
     <groupId>vivid</groupId>
     <artifactId>clojure-maven-plugin</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <executions>
         <execution>
             <id>leiningen-release-build</id>         <!-- Each execution requires a unique ID -->
@@ -209,4 +209,4 @@ This project is licensed under the [Apache License Version 2.0](LICENSE.txt), mo
 
 © Copyright Vivid Inc.
 
-[1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.3.0/assets/artwork/vivid-clojure-maven-plugin-logo.svg?raw=true
+[1]:https://github.com/vivid-inc/clojure-maven-plugin/blob/release-0.4.0/assets/artwork/vivid-clojure-maven-plugin-logo.svg?raw=true

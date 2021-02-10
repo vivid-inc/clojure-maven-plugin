@@ -1,4 +1,4 @@
-(defproject vivid.clojure-maven-plugin "0.3.0"
+(defproject vivid.clojure-maven-plugin "0.4.0"
 
   ; NOTE: This Leiningen project.clj is inferior to the Maven pom.xml.
   ; It exists for these purposes:
